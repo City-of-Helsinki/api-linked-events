@@ -1370,3 +1370,22 @@ paths:
         description: Event object that should replace the existing event, note that some implementations may retain unspecified fields at their original values.
         schema:
           $ref: '#/definitions/event'
+    delete:
+      summary: Delete an event
+      description: Deletes an event
+      operationId: event_delete
+      tags:
+      - event
+      responses:
+        204:
+          description: Event has been succesfully deleted
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the event to be deleted
