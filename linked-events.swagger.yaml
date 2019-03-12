@@ -221,6 +221,10 @@ paths:
           required: true
           schema:
             type: string
+          examples:
+            images-id-example:
+              value: 47742
+              summary: Image id example for internally stored image
     put:
       summary: Update an image
       description: >-
@@ -316,6 +320,10 @@ paths:
             for keywords beginning with string)
           schema:
             type: boolean
+          examples:
+            show-all-keywords:
+              value: true
+              summary: Example for showing all keywords
         - name: data_source
           in: query
           description: >-
@@ -323,6 +331,10 @@ paths:
             specified data source (see data source in keyword definition).
           schema:
             type: string
+          examples:
+            keyword-data-source:
+              value: matko
+              summary: Show only keywords from matko
         - name: text
           in: query
           description: >-
@@ -330,6 +342,10 @@ paths:
             string. This applies even when show_all_keywords is specified.
           schema:
             type: string
+          examples:
+            keyword-search:
+              value: alpakat
+              summary: Search for keywords containing "alpakka"
         - $ref: '#/components/parameters/keyword_sort_param'
       responses:
         '200':
@@ -365,6 +381,10 @@ paths:
           required: true
           schema:
             type: string
+          examples:
+            alpakka-keyword:
+              value: yso:p22261
+              summary: Fetch record for "alpakka" keyword
   /keyword_set/:
     get:
       summary: Return as list of keyword_sets for grouping keywords
@@ -405,6 +425,10 @@ paths:
           required: true
           schema:
             type: string
+          examples:
+            keyword-audiences:
+              value: helsinki:audiences
+              summary: Return keyword set for hel.fi audiences
       responses:
         '200':
           description: Keyword_set record
@@ -517,6 +541,10 @@ paths:
             no other filter is applied.
           schema:
             type: boolean
+          examples:
+            show-all-places:
+              value: true
+              summary: Return all places available
         - name: division
           in: query
           description: >-
@@ -525,6 +553,10 @@ paths:
             regardless of division type.
           schema:
             type: string
+          examples:
+            place-division-filter:
+              value: ocd-division/country:fi/kunta:helsinki/kaupunginosa:alppiharju
+              summary: Only return places in Alppiharju district
         - $ref: '#/components/parameters/place_sort_param'
       responses:
         '200':
@@ -560,6 +592,10 @@ paths:
           description: Id as defined in place model
           schema:
             type: string
+          examples:
+            place-example:
+              value: tprek:8254
+              summary: Example for retrieving Arabianranta library
   /language/:
     get:
       summary: Return a list of languages used for describing events
@@ -603,6 +639,10 @@ paths:
           required: true
           schema:
             type: string
+          examples:
+            language-et:
+              value: et
+              summary: Return only Estonian language record
   /event/:
     get:
       summary: Return a list of events
@@ -1021,7 +1061,7 @@ paths:
           examples:
             helmet-event:
               value: helmet:166429
-              summary: Legal advice event in library Töölö library
+              summary: Legal advice event in Töölö library
     put:
       summary: Update an event
       description: >-
@@ -1333,7 +1373,7 @@ components:
       title: Keyword
       description: >-
         Keywords are used to describe events. Linked events uses namespaced
-        keywords in order to support having events from different sources.
+        keywords in order to support keywords from different sources.
         Namespaces are needed because keywords are defined by the organization
         sourcing the events and can therefore overlap in meaning. Conversely the
         meaning of same keyword can vary between organizations. Organization
@@ -1788,6 +1828,10 @@ components:
       required: false
       schema:
         type: integer
+      examples:
+        page-3:
+          value: 3
+          summary: Request page 3 of the result set
     pagesize_param:
       name: page_size
       in: query
@@ -1795,6 +1839,10 @@ components:
       required: false
       schema:
         type: integer
+      examples:
+        pagesize-100:
+          value: 100
+          summary: Request 100 results per page, this is the maximum
     sort:
       name: sort
       in: query
