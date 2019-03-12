@@ -316,7 +316,7 @@ paths:
           description: >-
             Show all keywords, including those that are not associated with any
             events. Otherwise such keywords are hidden. When show_all_keywords
-            is specified, no other filter is applied, **except** "filter" (match
+            is specified, no other filter is applied, **except** "text" (match
             for keywords beginning with string)
           schema:
             type: boolean
@@ -327,8 +327,7 @@ paths:
         - name: data_source
           in: query
           description: >-
-            Search for keywords (**note**: NOT events) that come from the
-            specified data source (see data source in keyword definition).
+            Search for keywords that come from the specified data source (see data source in keyword definition).
           schema:
             type: string
           examples:
@@ -338,8 +337,7 @@ paths:
         - name: text
           in: query
           description: >-
-            Search for keywords (**note**: NOT events) that contain the given
-            string. This applies even when show_all_keywords is specified.
+            Search for keywords that contain the given string. This applies even when show_all_keywords is specified.
           schema:
             type: string
           examples:
@@ -456,8 +454,7 @@ paths:
 
         <h4 id="place-text">Place text</h4>
 
-        <p>To find places that contain a specific string, use the query
-        parameter <code>text</code>.</p>
+        <p>To find place names that contain a specific string, use the query parameter <code>text</code>. This will search through all language variants of the name as configured on the server.</p>
 
         <p>Example:</p>
 
@@ -536,9 +533,7 @@ paths:
         - name: show_all_places
           in: query
           description: >-
-            Show all places, including those that are not hosting any events.
-            Otherwise such places are hidden. When show_all_places is specified,
-            no other filter is applied.
+            Include places that have never hosted any events, otherwise such places are hidden. Other filters can be used to restrict results further.
           schema:
             type: boolean
           examples:
@@ -1426,8 +1421,7 @@ components:
         aggregate:
           type: boolean
           description: >-
-            FIXME(verify) This keyword is an combination of several keywords at
-            source
+            FIXME(verify) This keyword is a combination of several keywords at source
         data_source:
           type: string
           description: >-
