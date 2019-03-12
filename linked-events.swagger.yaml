@@ -998,6 +998,13 @@ paths:
             regardless of division type.
           schema:
             type: string
+          examples:
+            district-malmi:
+              value: ocd-division/country:fi/kunta:helsinki/peruspiiri:malmi
+              summary: Return events in the district of Malmi
+            any-toolo:
+              value: malmi
+              summary: Return events in any division named Malmi
         - $ref: '#/components/parameters/event_keyword_param'
         - $ref: '#/components/parameters/event_min_duration_param'
         - $ref: '#/components/parameters/event_max_duration_param'
