@@ -1406,6 +1406,11 @@ components:
             en:
               type: string
               description: Keyword in English
+        translation_available:
+          type: boolean
+          description: >-
+            There is potentially data available in this language. If this is false,
+            there is no data available in this language.
         images:
           type: array
           items:
