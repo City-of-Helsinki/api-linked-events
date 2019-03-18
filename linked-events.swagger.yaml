@@ -1864,37 +1864,56 @@ components:
       description: >-
         Sort the returned events in the given order. Possible sorting criteria
         are 'start_time', 'end_time', 'duration' and 'last_modified_time'. The
-        default ordering is '-last_modified_time'.
+        default ordering is '-last_modified_time', ie. sort most recently modified
+        events first
       schema:
         type: string
+      examples:
+        sort-shortest-event-first:
+          value: duration
+          summary: Sort briefest event first
     place_sort_param:
       name: sort
       in: query
       description: >-
         Sort the returned places in the given order. Possible sorting criteria
         are 'n_events', 'id', 'name', 'street_address' and 'postal_code'. The
-        default ordering is '-n_events'.
+        default ordering is '-n_events'. Ie. places with most events first.
       schema:
         type: string
+      examples:
+        places_name_sort:
+          value: name
+          summary: Sort places in ascending alphabetical order
     keyword_sort_param:
       name: sort
       in: query
       description: >-
         Sort the returned keywords in the given order. Possible sorting criteria
         are 'n_events', 'id', 'name', 'data_source'. The default ordering is
-        '-data_source', '-n_events'.
+        '-data_source', '-n_events'. Ie. sort by descending data source order
+        (data sources represent different wordsets, thus grouping them) and
+        then by descending amount of events.
       schema:
         type: string
+      examples:
+        keyword_name_sort:
+          value: name
+          summary: Sort keywords in ascending alphabetical order
     include_param:
       name: include
       in: query
       description: >-
         Embed given reference-type fields directly into the response, otherwise
-        they are returned as URI references.
+        they are returned as URI references. Note that expandable fields vary
+        between endpoints. This is most useful with event endpoint.
       schema:
         type: array
         items:
           type: string
+      examples:
+        value: location
+        summary: Expand locations in the returned response
     event_text_param:
       name: text
       in: query
