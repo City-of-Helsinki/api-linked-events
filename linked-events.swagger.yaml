@@ -152,7 +152,7 @@ paths:
         - $ref: '#/components/parameters/page_param'
         - $ref: '#/components/parameters/pagesize_param'
         - $ref: '#/components/parameters/include_param'
-        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/image_sort'
       responses:
         '200':
           description: List of images
@@ -1844,15 +1844,20 @@ components:
         pagesize-100:
           value: 100
           summary: Request 100 results per page, this is the maximum
-    sort:
+    image_sort:
       name: sort
       in: query
       description: >-
-        return the results in ascending or descending order by the named field.
-        sorting is only supported for some string, integer and datetime fields.
+        return the results in ascending or descending order by the named field. For images,
+        the only supported sorting field is 'last_modified_time'. The default ordering
+        is '-last_modified_time', ie. sort most recently modified images first.
       required: false
       schema:
         type: string
+      examples:
+        image_lrm_first:
+          value: last_modified_time
+          summary: Sort with ye olde images first
     event_sort_param:
       name: sort
       in: query
