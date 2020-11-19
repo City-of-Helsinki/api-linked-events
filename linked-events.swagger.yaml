@@ -5,17 +5,13 @@ info:
   title: Linked Events information API
   description: |-
       Linked Events provides categorized data on events and places using JSON-LD format.
-
       Events can be searched by date and location. Location can be exact address or larger
       area such as neighbourhood or borough
-
       JSON-LD format is streamlined using include mechanism. API users can request that certain
       fields are included directly into the result, instead of being hyperlinks to objects.
-
       Several fields are multilingual. These are implemented as object with each language variant
       as property. In this specification each multilingual field has (fi,sv,en) property triplet as
       example.
-
   termsOfService: (depends on data provider)
   version: v1
 
@@ -80,8 +76,10 @@ parameters:
   include_param:
     name: include
     in: query
-    type: string
-    description: Embed given reference-type fields, comma-separated if several, directly into the response, otherwise they are returned as URI references.
+    type: array
+    items:
+      type: string
+    description: Embed given reference-type fields directly into the response, otherwise they are returned as URI references.
   event_text_param:
     name: text
     in: query
@@ -143,8 +141,15 @@ parameters:
   event_location_param:
     name: location
     in: query
-    type: string
+    type: array
+    items:
+      type: integer
     description: Search for events in given locations as specified by id. Multiple ids are separated by comma
+  event_showall_param:
+    name: show_all
+    in: query
+    type: boolean
+    description: Show all events (optional)
   event_keyword_param:
     name: keyword
     in: query
@@ -155,6 +160,14 @@ parameters:
     in: query
     type: string
     description: Search for events with all given keywords as specified by id. Multiple ids are separated by comma
+  event_recurring_param:
+    name: recurring
+    in: query
+    type: string
+    enum:
+      - super
+      - sub
+    description: Search for events based on whether they are part of recurring event set. 'super' specifies recurring, while 'sub' is non-recurring.
   event_min_duration_param:
     name: min_duration
     in: query
@@ -170,6 +183,11 @@ parameters:
     in: query
     description: Search for events that have data or are organized in this language.
     type: string
+  event_organization_param:
+    name: publisher
+    in: query
+    type: string
+    description: Search for events published by the given organization
   event_translation_param:
     name: translation
     in: query
@@ -200,6 +218,31 @@ parameters:
     in: query
     type: string
     description: Search for events with the given superevent as specified by id, including none. Multiple ids are separated by comma
+  event_address_locality_fi:
+    name: address_locality_fi
+    in: query
+    type: string
+    description: Search for events in given address localities (fi). Multiple localities can be entered by separating them by a comma
+  event_address_locality_sv:
+    name: address_locality_sv
+    in: query
+    type: string
+    description: Search for events in given address localities (sv). Multiple localities can be entered by separating them by a comma
+  event_address_locality_en:
+    name: address_locality_en
+    in: query
+    type: string
+    description: Search for events in given address localities (en). Multiple localities can be entered by separating them by a comma
+  event_language:
+    name: language
+    in: query
+    type: string
+    description: Search for events in given language
+  event_publication_status:
+    name: publication_status
+    in: query
+    type: string
+    description: Filter events by publication status (either draft or public)
 
 definitions:
 
@@ -278,7 +321,7 @@ definitions:
             description: Link to Finnish page
             type: string
             format: url
-          se:
+          sv:
             description: Link to Swedish page
             type: string
             format: url
@@ -389,6 +432,10 @@ definitions:
     required:
     - url
     properties:
+      id:
+        type: integer
+        format: int64
+        description: image id
       name:
         type: object
         properties:
@@ -427,7 +474,16 @@ definitions:
       license:
         type: string
         description: License data for the image. May be "cc_by" (default) or "event_only". The latter license restricts use of the image and is specified on the API front page.
-
+  image_url:
+    title: Image URL
+    description: Images URL
+    type: object
+    required:
+      - url
+    properties:
+      url:
+        type: string
+        description: The image file URL.
   organization:
     title: Organization
     description: Organizations are the entities that publish events and other data.
@@ -567,8 +623,17 @@ definitions:
           type: string
           description: Unique identifier for this keyword_set. These should be URIs identifying the source and the keyword_set itself, and preferably also well formed http-URLs pointing to more information about the keyword.
         name:
-          type: string
-          description: Name for this keyword_set. This should be human readable, such that it could be shown as label in UI
+          type: object
+          properties:
+            fi:
+              type: string
+              description: Keyword set name in Finnish
+            sv:
+              type: string
+              description: Keyword set name in Swedish
+            en:
+              type: string
+              description: Keyword set name in English
         origin_id:
           type: string
           description: 'Set identifier in the originating system, if any'
@@ -619,13 +684,18 @@ definitions:
           fi:
             description: Name of the language in Finnish
             type: string
-          se:
+          sv:
             description: Name of the language in Swedish
             type: string
           en:
             description: Name of the language in English
             type: string
 
+  id_ref:
+    type: object
+    properties:
+      "@id":
+        type: string
   event:
     title: Events
     type: object
@@ -654,7 +724,7 @@ definitions:
           "$ref": '#/definitions/language'
       super_event:
         description: references the aggregate event containing this event
-        type: string
+        "$ref": '#/definitions/id_ref'
       super_event_type:
         description: If the event has sub_events, describes the type of the event. Current options are 'null', 'recurring', which means a repeating event, and 'umbrella', which means a major event that has subevents.
         type: string
@@ -680,7 +750,7 @@ definitions:
           "$ref": '#/definitions/event'
         description: for aggregate events this contains references to all sub events. Usually this means that the sub events are part of series. The field 'super_event_type' tells the type of the aggregate event.
       custom_data:
-        type: string
+        type: object
         description: 'Key value field for custom data. FIXME: is there 6Aika-wide use case for this?'
       name:
         type: object
@@ -689,7 +759,7 @@ definitions:
           fi:
             description: Name of the event in Finnish
             type: string
-          se:
+          sv:
             description: Name of the event in Swedish
             type: string
           en:
@@ -715,7 +785,7 @@ definitions:
             description: Link to Finnish page
             type: string
             format: url
-          se:
+          sv:
             description: Link to Swedish page
             type: string
             format: url
@@ -729,7 +799,7 @@ definitions:
         properties:
           fi:
             description: Finnish description of the event
-          se:
+          sv:
             description: Swedish description of the event
           en:
             description: English description of the event
@@ -739,10 +809,14 @@ definitions:
         properties:
           fi:
             description: short Finnish description of the event
-          se:
+          sv:
             description: short Swedish description of the event
           en:
             description: short English description of the event
+      "@context":
+        type: string
+      "@type":
+        type: string
       date_published:
         type: string
         format: date-time
@@ -752,10 +826,13 @@ definitions:
         description: Description of who is responsible for the practical implementation of the event
         properties:
           fi:
+            type: string
             description: provider name in Finnish for the event
-          se:
+          sv:
+            type: string
             description: provider name in Swedish for the event
           en:
+            type: string
             description: provider name in English for the event
       location_extra_info:
         type: object
@@ -763,7 +840,7 @@ definitions:
         properties:
           fi:
             description: location extra info in Finnish for the event
-          se:
+          sv:
             description: location extra info in Swedish for the event
           en:
             description: location extra info in English for the event
@@ -775,6 +852,10 @@ definitions:
         type: string
         format: date-time
         description: Time the event will end
+      has_start_time:
+        type: boolean
+      has_end_time:
+        type: boolean
       audience:
         description: The audience groups (picked from keywords) this event is intended for
         type: array
@@ -849,7 +930,7 @@ definitions:
             description: Link to Finnish page
             type: string
             format: url
-          se:
+          sv:
             description: Link to Swedish page
             type: string
             format: url
@@ -1005,7 +1086,10 @@ paths:
       - name: image_file
         in: formData
         type: file
-
+      - name: image_object
+        in: body
+        schema:
+          $ref: '#/definitions/image_url'
   /image/{id}/:
     get:
       summary: Return information for single image
@@ -1118,7 +1202,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/keyword'
-
+    post:
+      summary: Creates new keyword
+      description: Endpoint for creating new keywords
+      operationId: keyword_create
+      tags:
+      - filter
+      responses:
+        201:
+          description: Object has been succesfully created.
+          schema:
+            $ref: "#/definitions/keyword"
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+        - name: keyword_object
+          in: body
+          schema:
+            $ref: '#/definitions/keyword'
   /keyword/{id}/:
     get:
       summary: Return information for single keyword
@@ -1136,7 +1241,53 @@ paths:
         in: path
         name: id
         required: true
-
+    put:
+      summary: Update a keyword
+      description: Keywords can be updated if the user has appropriate access permissions.
+      operationId: keyword_update
+      tags:
+      - filter
+      responses:
+        200:
+          description: Keyword has been succesfully replaced
+          schema:
+            $ref: "#/definitions/keyword"
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the keyword to be updated
+      - name: keyword_object
+        in: body
+        description: Keyword object that should replace the existing keyword
+        schema:
+          $ref: "#/definitions/keyword"
+    delete:
+      summary: Delete a keyword
+      description: Deletes a keyword
+      operationId: keyword_delete
+      tags:
+      - filter
+      responses:
+        204:
+          description: Keyword has been succesfully deleted
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the keyword to be deleted
   /keyword_set/:
     get:
       summary: Return as list of keyword_sets for grouping keywords
@@ -1155,7 +1306,7 @@ paths:
             type: object
             properties:
               meta:
-                $ref: '#/definitions/keyword'
+                $ref: '#/definitions/meta_definition'
               data:
                 type: array
                 items:
@@ -1296,7 +1447,14 @@ paths:
           in: query
           type: string
           description: 'You may filter places by specific OCD division id, or by division name. The latter query checks all divisions with the name, regardless of division type.'
-        - $ref: '#/parameters/place_sort_param'
+        - name: data_source
+          in: query
+          type: string
+          description: "Search for places that come from specified data source"
+        - name: text
+          in: query
+          type: string
+        - $ref: "#/parameters/place_sort_param"
 
       responses:
         200:
@@ -1310,6 +1468,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/place'
+    post:
+      summary: Creates new place
+      description: Endpoint for creating new places
+      operationId: place_create
+      tags:
+      - filter
+      responses:
+        201:
+          description: Object has been succesfully created. A copy of the object is returned in response body and headers contain Location pointing to the created event
+          schema:
+            $ref: '#/definitions/place'
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+        - name: place_object
+          in: body
+          schema:
+            $ref: '#/definitions/place'
 
   /place/{id}/:
     get:
@@ -1328,7 +1508,53 @@ paths:
         name: id
         required: true
         description: Id as defined in place model
-
+    put:
+      summary: Update a place
+      description: Place can be updated if the user has appropriate access permissions.
+      operationId: place_update
+      tags:
+      - filter
+      responses:
+        200:
+          description: Place has been succesfully replaced
+          schema:
+            $ref: "#/definitions/place"
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the place to be updated
+      - name: place_object
+        in: body
+        description: Place object that should replace the existing place.
+        schema:
+          $ref: "#/definitions/place"
+    delete:
+      summary: Delete a place
+      description: Deletes a place
+      operationId: place_delete
+      tags:
+        - filter
+      responses:
+        204:
+          description: Place has been succesfully deleted
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the place to be deleted
   /language/:
     get:
       summary: Return a list of languages used for describing events
@@ -1600,33 +1826,46 @@ paths:
                 items:
                   $ref: '#/definitions/event'
       parameters:
-      - $ref: '#/parameters/page_param'
-      - $ref: '#/parameters/pagesize_param'
-      - $ref: '#/parameters/include_param'
-      - $ref: '#/parameters/event_text_param'
-      - $ref: '#/parameters/event_last_modified_param'
-      - $ref: '#/parameters/event_show_deleted_param'
-      - $ref: '#/parameters/event_event_status_param'
-      - $ref: '#/parameters/event_is_free_param'
-      - $ref: '#/parameters/event_start_param'
-      - $ref: '#/parameters/event_end_param'
-      - $ref: '#/parameters/event_bbox_param'
-      - $ref: '#/parameters/event_data_source_param'
-      - $ref: '#/parameters/event_location_param'
-      - $ref: '#/parameters/event_division_param'
-      - $ref: '#/parameters/event_keyword_param'
-      - $ref: '#/parameters/event_keyword_AND_param'
-      - $ref: '#/parameters/event_min_duration_param'
-      - $ref: '#/parameters/event_max_duration_param'
-      - $ref: '#/parameters/event_language_param'
-      - $ref: '#/parameters/event_translation_param'
-      - $ref: '#/parameters/event_in_language_param'
-      - $ref: '#/parameters/event_publisher_param'
-      - $ref: '#/parameters/event_publisher_ancestor_param'
-      - $ref: '#/parameters/event_super_event_type_param'
-      - $ref: '#/parameters/event_super_event_param'
-      - $ref: '#/parameters/event_sort_param'
-
+        - $ref: '#/parameters/page_param'
+        - $ref: '#/parameters/pagesize_param'
+        - $ref: '#/parameters/include_param'
+        - $ref: '#/parameters/event_text_param'
+        - $ref: '#/parameters/event_last_modified_param'
+        - $ref: '#/parameters/event_show_deleted_param'
+        - $ref: '#/parameters/event_event_status_param'
+        - $ref: '#/parameters/event_is_free_param'
+        - $ref: '#/parameters/event_start_param'
+        - $ref: '#/parameters/event_end_param'
+        - $ref: '#/parameters/event_bbox_param'
+        - $ref: '#/parameters/event_data_source_param'
+        - $ref: '#/parameters/event_location_param'
+        - $ref: '#/parameters/event_division_param'
+        - $ref: '#/parameters/event_showall_param'
+        - name: division
+          in: query
+          type: string
+          description: 'You may filter places by specific OCD division id, or by division name. The latter query checks all divisions with the name, regardless of division type.'
+        - $ref: '#/parameters/event_keyword_param'
+        - $ref: '#/parameters/event_keyword_AND_param'
+        - $ref: '#/parameters/event_recurring_param'
+        - $ref: '#/parameters/event_min_duration_param'
+        - $ref: '#/parameters/event_max_duration_param'
+        - $ref: '#/parameters/event_organization_param'
+        - $ref: '#/parameters/event_language_param'
+        - $ref: '#/parameters/event_translation_param'
+        - $ref: '#/parameters/event_in_language_param'
+        - $ref: '#/parameters/event_publisher_param'
+        - $ref: '#/parameters/event_publisher_ancestor_param'
+        - $ref: '#/parameters/event_super_event_type_param'
+        - $ref: '#/parameters/event_super_event_param'
+        - $ref: '#/parameters/event_sort_param'
+        - $ref: '#/parameters/page_param'
+        - $ref: '#/parameters/pagesize_param'
+        - $ref: '#/parameters/event_address_locality_fi'
+        - $ref: '#/parameters/event_address_locality_sv'
+        - $ref: '#/parameters/event_address_locality_en'
+        - $ref: '#/parameters/event_language'
+        - $ref: '#/parameters/event_publication_status'
     post:
       summary: Create a new event or events
       operationId: event_create
@@ -1700,6 +1939,12 @@ paths:
         type: string
         description: Event identifier as defined in event schema
         required: true
+      - name: include
+        in: query
+        type: array
+        items:
+          type: string
+        description: Embed given reference-type fields directly into the response, otherwise they are returned as URI references.
     put:
       summary: Update an event
       description: Events can be updated if the user has appropriate access permissions. The original implementation behaves like PATCH, ie. if some field is left out from the PUT call, its value is retained in database. In order to ensure consistent behaviour, users should always supply every field in PUT call.
