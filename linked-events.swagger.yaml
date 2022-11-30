@@ -1310,6 +1310,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/place'
+    post:
+      summary: Creates new place
+      description: Endpoint for creating new places
+      operationId: place_create
+      tags:
+      - filter
+      responses:
+        201:
+          description: Object has been succesfully created.
+          schema:
+            $ref: '#/definitions/place'
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - name: place_object
+        in: body
+        schema:
+          $ref: '#/definitions/place'
 
   /place/{id}/:
     get:
@@ -1328,7 +1350,53 @@ paths:
         name: id
         required: true
         description: Id as defined in place model
-
+    put:
+      summary: Update a place
+      description: Place can be updated if the user has appropriate access permissions.
+      operationId: place_update
+      tags:
+      - filter
+      responses:
+        200:
+          description: Place has been succesfully replaced
+          schema:
+            $ref: '#/definitions/place'
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the place to be updated
+      - name: place_object
+        in: body
+        description: Place object that should replace the existing place.
+        schema:
+          $ref: '#/definitions/place'
+    delete:
+      summary: Delete a place
+      description: Deletes a place
+      operationId: place_delete
+      tags:
+      - filter
+      responses:
+        204:
+          description: Place has been succesfully deleted
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the place to be deleted
   /language/:
     get:
       summary: Return a list of languages used for describing events
