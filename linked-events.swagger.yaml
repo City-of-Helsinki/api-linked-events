@@ -1118,7 +1118,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/keyword'
-
+    post:
+      summary: Creates new keyword
+      description: Endpoint for creating new keywords
+      operationId: keyword_create
+      tags:
+      - filter
+      responses:
+        201:
+          description: Object has been succesfully created.
+          schema:
+            $ref: '#/definitions/keyword'
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - name: keyword_object
+        in: body
+        schema:
+          $ref: '#/definitions/keyword'
   /keyword/{id}/:
     get:
       summary: Return information for single keyword
@@ -1136,7 +1157,53 @@ paths:
         in: path
         name: id
         required: true
-
+    put:
+      summary: Update a keyword
+      description: Keywords can be updated if the user has appropriate access permissions.
+      operationId: keyword_update
+      tags:
+      - filter
+      responses:
+        200:
+          description: Keyword has been succesfully replaced
+          schema:
+            $ref: '#/definitions/keyword'
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the keyword to be updated
+      - name: keyword_object
+        in: body
+        description: Keyword object that should replace the existing keyword
+        schema:
+          $ref: '#/definitions/keyword'
+    delete:
+      summary: Delete a keyword
+      description: Deletes a keyword
+      operationId: keyword_delete
+      tags:
+      - filter
+      responses:
+        204:
+          description: Keyword has been succesfully deleted
+        401:
+          description: User was not authenticated
+        403:
+          description: User does not have necessary permissions
+      parameters:
+      - type: string
+        in: path
+        name: id
+        required: true
+        description: Identifier for the keyword to be deleted
   /keyword_set/:
     get:
       summary: Return as list of keyword_sets for grouping keywords
