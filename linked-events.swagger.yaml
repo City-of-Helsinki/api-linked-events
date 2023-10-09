@@ -44,6 +44,8 @@ tags:
     description: Create and edit seats reservations
   - name: signup
     description: Search and edit signups
+  - name: signup group
+    description: Search and edit signup groups
 paths:
   /search/:
     get:
@@ -1719,7 +1721,7 @@ paths:
           schema:
             type: integer
       requestBody:
-        description: Subject and message of email message. Optionally list of signups to which the email will be sent.
+        description: Subject and message of email message. Optionally list of signups and/or signup groups to which the email will be sent.
         content:
           "*/*":
             schema:
@@ -1819,7 +1821,7 @@ paths:
         <pre><code>signup/?registration=1</code></pre>
 
         <h3 id="signup-text">Signup text</h3>
-        <p>To find out signups that contain a specific string in name, email, extra_info, membership_number or phone_number fields, use the query parameter <code>text</code>.</p>
+        <p>To find out signups that contain a specific string in name, email, membership_number or phone_number fields, use the query parameter <code>text</code>.</p>
         <p>Example:</p>
         <pre><code>signup/?text=shostakovich</code></pre>
 
@@ -1863,7 +1865,7 @@ paths:
         - signup
       responses:
         201:
-          description: Signups has been succesfully created.
+          description: Signups has been successfully created.
           content:
             application/json:
               schema:
@@ -1879,13 +1881,13 @@ paths:
           content: {}
   /signup/{id}/:
     get:
-      summary: Return information for single signup
+      summary: Return information for a single signup
       operationId: signup_retrieve
       tags:
         - signup
       responses:
         200:
-          description: Single signup object. Signup can be retrieved if the user has appropriate access permissions. Also cancellation_code can be used for the authentication e.g. <b>/signup/1/?cancellation_code=4e203c8c-40c1-48b8-a5b4-2ff9e177c476</b>.
+          description: Single signup object. Signup can be retrieved if the user has appropriate access permissions.
           content:
             application/json:
               schema:
@@ -1901,7 +1903,7 @@ paths:
       tags:
         - signup
       summary: Update a signup
-      description: Signup can be updated if the user has appropriate access permissions. Also cancellation_code can be used for the authentication e.g. <b>/signup/1/?cancellation_code=4e203c8c-40c1-48b8-a5b4-2ff9e177c476</b>. The original implementation behaves like PATCH, ie. if some field is left out from the PUT call, its value is retained in database. In order to ensure consistent behaviour, users should always supply every field in PUT call.
+      description: Signup can be updated if the user has appropriate access permissions. The original implementation behaves like PATCH, ie. if some field is left out from the PUT call, its value is retained in database. In order to ensure consistent behaviour, users should always supply every field in PUT call.
       operationId: signup_update
       parameters:
         - name: id
@@ -1919,7 +1921,7 @@ paths:
         required: false
       responses:
         200:
-          description: Signup has been succesfully replaced.
+          description: Signup has been successfully replaced.
           content:
             application/json:
               schema:
@@ -1940,7 +1942,7 @@ paths:
       tags:
         - signup
       summary: Delete a signup
-      description: Signup can be deleted if the user has appropriate access permissions. Also cancellation_code can be used for the authentication e.g. <b>/signup/1/?cancellation_code=4e203c8c-40c1-48b8-a5b4-2ff9e177c476</b>.
+      description: Signup can be deleted if the user has appropriate access permissions.
       operationId: signup_delete
       parameters:
         - name: id
@@ -1959,6 +1961,160 @@ paths:
         403:
           description: User does not have necessary permissions.
           content: {}
+  /signup_group/:
+    get:
+      summary: Return a list of signup groups
+      description: |-
+        <h2 id="filtering-retrieved-signup-groups">Filtering retrieved signup groups</h2>
+        <p>Only admin users of the registration publisher organization can search signup groups.</p>
+        <p>Query parameters can be used to filter the retrieved signup groups by the following criteria.</p>
+
+        <h3 id="signup-group-registration">Registration</h3>
+        <p>To find out signup groups of specific registration, use the query parameter <code>registration</code>. You may separate values by commas if you wish to query for several registrations.</p>
+        <p>Example:</p>
+        <pre><code>signup_group/?registration=1</code></pre>
+
+        <h3 id="signup-group-text">Signup group text</h3>
+        <p>To find out signup groups whose signups contain a specific string in name, email, membership_number or phone_number fields, use the query parameter <code>text</code>.</p>
+        <p>Example:</p>
+        <pre><code>signup_group/?text=shostakovich</code></pre>
+
+        <h3 id="signup-group-attendee-status">Attendee status</h4>
+        <p>You may use the query parameter <code>attendee_status</code>, comma separated, to get only signup groups with specific attendee status.
+        <p>Example:</p>
+        <pre><code>signup_group/?attendee_status=attending</code></pre>
+      operationId: signup_group_list
+      tags:
+        - signup group
+      responses:
+        200:
+          description: List of signup groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/meta_definition"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/signup_group"
+      parameters:
+        - $ref: "#/components/parameters/page_param"
+        - $ref: "#/components/parameters/pagesize_param"
+        - $ref: "#/components/parameters/signup_group_registration_param"
+        - $ref: "#/components/parameters/signup_group_text_param"
+        - $ref: "#/components/parameters/signup_group_attendee_status_param"
+    post:
+      summary: Create new a signup group to the registration
+      operationId: signup_group_create
+      requestBody:
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/create_signup_group_payload"
+        required: false
+      tags:
+        - signup group
+      responses:
+        201:
+          description: Signup group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/create_signup_group_response"
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
+  /signup_group/{id}/:
+    get:
+      summary: Return information for a single signup group
+      operationId: signup_group_retrieve
+      tags:
+        - signup group
+      responses:
+        200:
+          description: Single signup group object. Signup group can be retrieved if the user has appropriate access permissions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/signup_group"
+      parameters:
+        - name: id
+          in: path
+          description: Signup group identifier as defined in signup group schema
+          required: true
+          schema:
+            type: integer
+    put:
+      tags:
+        - signup group
+      summary: Update a signup group
+      description: Signup can be updated if the user has appropriate access permissions. The original implementation behaves like PATCH, ie. if some field is left out from the PUT call, its value is retained in database. In order to ensure consistent behaviour, users should always supply every field in PUT call.
+      operationId: signup_group_update
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for the signup group to be updated
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Signup group object that should replace the existing signup.
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/signup_group"
+        required: false
+      responses:
+        200:
+          description: Signup group has been successfully replaced.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/signup_group"
+        400:
+          description:
+            Input format was not correct, eg. mandatory field was missing
+            or JSON was malformed.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
+      x-codegen-request-body-name: signup_group_object
+    delete:
+      tags:
+        - signup group
+      summary: Delete a signup group
+      description: Signup group can be deleted if the user has appropriate access permissions.
+      operationId: signup_group_delete
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for the signup group to be deleted
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Signup group has been successfully deleted.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
 components:
   schemas:
     meta_definition:
@@ -2285,7 +2441,8 @@ components:
           required:
             - origin_id
             - admin_users
-            - reguar_users
+            - registration_admin_users
+            - regular_users
           properties:
             origin_id:
               type: string
@@ -2301,6 +2458,15 @@ components:
                   items:
                     type: string
                     example: admin
+            registration_admin_users:
+              type: object
+              properties:
+                username:
+                  type: array
+                  description: Usernames of registration admin users
+                  items:
+                    type: string
+                    example: registration_admin
             regular_users:
               type: object
               properties:
@@ -2892,11 +3058,6 @@ components:
           type: string
           description: Methods to send notifications to the attendee. Options are "none", "sms", "email" and "sms and email".
           example: sms and email
-        cancellation_code:
-          type: string
-          description: Access code which user can use to delete, update or view the signup
-          readOnly: true
-          example: 4e203c8c-40c1-48b8-a5b4-2ff9e177c476
         attendee_status:
           type: string
           description: Status of the attendee. Options are "attending" and "waitlisted".
@@ -2914,6 +3075,26 @@ components:
           type: string
           description: Attendee´s service language
           example: fi
+        created_time:
+          type: string
+          format: date-time
+          description: Time when this signup was created
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        last_modified_time:
+          type: string
+          format: date-time
+          description: Time when this signup was last modified
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        created_by:
+          type: string
+          description: URL reference to the user that created this signup (user endpoint)
+          readOnly: true
+        last_modified_by:
+          type: string
+          description: URL reference to the user that last modfied this signup (user endpoint)
+          readOnly: true
       description: Signups are used as attendees for registrations.
     create_signup_payload:
       title: Create signups payload
@@ -2968,6 +3149,107 @@ components:
               items:
                 $ref: "#/components/schemas/signup"
       description: Response of the create signups request
+    signup_group:
+      title: Signup group
+      type: object
+      required:
+        - notifications
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this signup group
+          readOnly: true
+        registration:
+          type: integer
+          description: Id of the registration to which this signup group is related to
+          readOnly: true
+        signups:
+          type: array
+          description: The list of attendees belonging to this signup group
+          items:
+            $ref: "#/components/schemas/signup"
+        extra_info:
+          type: string
+          description: Extra information about the group
+        created_time:
+          type: string
+          format: date-time
+          description: Time when this signup group was created
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        last_modified_time:
+          type: string
+          format: date-time
+          description: Time when this signup group was last modified
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        created_by:
+          type: string
+          description: URL reference to the user that created this signup group (user endpoint)
+          readOnly: true
+        last_modified_by:
+          type: string
+          description: URL reference to the user that last modfied this signup group (user endpoint)
+          readOnly: true
+      description: Signups are used as attendees for registrations.
+    create_signup_group_payload:
+      title: Create signup group payload
+      type: object
+      required:
+        - reservation_code
+        - registration
+        - signups
+      properties:
+        reservation_code:
+          type: string
+          description: Code value from the SeatsReservation object
+          example: 0b371ac4-b9a8-43e2-8e09-4e660b02a735
+        registration:
+          type: integer
+          description: Id of the registration to which the user is going to signup a group
+          example: 1
+        signups:
+          type: array
+          description: The list of persons to enrol to a registration as members of the same group
+          items:
+            $ref: "#/components/schemas/signup"
+      description: Payload which is to used to create a signup group to a registration
+    create_signup_group_response:
+      title: Create signup group response
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of this signup group
+        registration:
+          type: integer
+          description: Id of the registration to which the group was signed up to.
+          example: 1
+        signups:
+          type: array
+          description: The list of persons belonging to the group
+          items:
+            $ref: "#/components/schemas/signup"
+        extra_info:
+          type: string
+          description: Extra information about the group
+        created_time:
+          type: string
+          format: date-time
+          description: Time when this signup group was created
+          example: 2023-04-06T02:19:37.305781+03:00
+        last_modified_time:
+          type: string
+          format: date-time
+          description: Time when this signup group was last modified
+          example: 2023-04-06T02:19:37.305781+03:00
+        created_by:
+          type: string
+          description: URL reference to the user that created this signup group (user endpoint)
+        last_modified_by:
+          type: string
+          description: URL reference to the user that last modfied this signup group (user endpoint)
+      description: Response of the create signup group request
     registration:
       title: Registration
       type: object
@@ -3011,16 +3293,16 @@ components:
           type: string
           description: Id for the organization that published this registration. This value is inherited from the event of the registration.
           readOnly: true
-        created_at:
+        created_time:
           type: string
           format: date-time
-          description: Creation time for the registration entry
+          description: Time when this registration was created
           example: 2023-04-06T02:19:37.305781+03:00
           readOnly: true
-        last_modified_at:
+        last_modified_time:
           type: string
           format: date-time
-          description: Time this registration was modified
+          description: Time when this registration was last modified
           example: 2023-04-06T02:19:37.305781+03:00
           readOnly: true
         attendee_registration:
@@ -3075,14 +3357,14 @@ components:
           items:
             type: string
           example: ["name", "street_address", "zipcode", "city"]
-        registration_users:
+        registration_user_accesses:
           type: array
-          description: Registration users are used to define registration specific permissions.
+          description: Registration user accesses are used to define registration specific permissions.
           items:
-            $ref: "#/components/schemas/registration_user"
+            $ref: "#/components/schemas/registration_user_access"
       description: Registrations are used to store settings related to event registration.
-    registration_user:
-      title: Registration users
+    registration_user_access:
+      title: Registration user accesses
       type: object
       properties:
         id:
@@ -3092,6 +3374,10 @@ components:
         email:
           type: string
           description: Email address of the registration user
+        language:
+          type: string
+          description: The registration user's service language that should be used in invitation emails.
+          example: fi
       description: List of email addresses which has registration specific permissions.
     seats_reservation:
       title: Seat reservation
@@ -3142,10 +3428,16 @@ components:
           example: <p>Email message body</p>
         signups:
           type: array
-          description: Ids of the attendees who will receive the email message
+          description: Ids of attendees who will receive the email message
           items:
             type: integer
           example: [1]
+        signup_groups:
+          type: array
+          description: Ids of signup groups whose responsible attendees will receive the email message
+          items:
+            type: integer
+          example: [ 1 ]
       description: Payload of the send message request.
     send_message_response:
       title: Send message response
@@ -3161,10 +3453,16 @@ components:
           example: Email message body
         signups:
           type: array
-          description: Ids of the attendees to who the email was sent.
+          description: Ids of the attendees to whom the email was sent to.
           items:
             type: integer
           example: [1]
+        signup_groups:
+          type: array
+          description: Ids of the signup groups to whose responsible attendees the email was sent to.
+          items:
+            type: integer
+          example: [ 1 ]
         subject:
           type: string
           description: Subject of the sent email.
@@ -3740,12 +4038,31 @@ components:
     signup_text_param:
       name: text
       in: query
-      description: Search (case insensitive) through all signups's text fields (name, email, exra_info, membership_number and phone_number) of a signup.
+      description: Search (case insensitive) through text fields (name, email, membership_number and phone_number) of a signup.
       schema:
         type: string
     signup_attendee_status_param:
       name: attendee_status
       in: query
       description: Search for signups with the given attendee status. Multiple types are separated by comma.
+      schema:
+        type: string
+
+    signup_group_registration_param:
+      name: registration
+      in: query
+      description: Search for signup groups with the given registration as specified by id. Multiple ids are separated by comma.
+      schema:
+        type: string
+    signup_group_text_param:
+      name: text
+      in: query
+      description: Search (case insensitive) through text fields (name, email,  membership_number and phone_number) of signups in a signup group.
+      schema:
+        type: string
+    signup_group_attendee_status_param:
+      name: attendee_status
+      in: query
+      description: Search for signup groups with the given attendee status. Multiple types are separated by comma.
       schema:
         type: string
