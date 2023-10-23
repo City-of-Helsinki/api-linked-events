@@ -2026,13 +2026,13 @@ paths:
                 $ref: "#/components/schemas/create_signup_group_response"
         400:
           description: Input format was not correct, eg. mandatory field was missing or JSON was malformed.
-          content: { }
+          content: {}
         401:
           description: User was not authenticated.
-          content: { }
+          content: {}
         403:
           description: User does not have necessary permissions.
-          content: { }
+          content: {}
   /signup_group/{id}/:
     get:
       summary: Return information for a single signup group
@@ -2084,13 +2084,13 @@ paths:
           description:
             Input format was not correct, eg. mandatory field was missing
             or JSON was malformed.
-          content: { }
+          content: {}
         401:
           description: User was not authenticated.
-          content: { }
+          content: {}
         403:
           description: User does not have necessary permissions.
-          content: { }
+          content: {}
       x-codegen-request-body-name: signup_group_object
     delete:
       tags:
@@ -2108,13 +2108,13 @@ paths:
       responses:
         204:
           description: Signup group has been successfully deleted.
-          content: { }
+          content: {}
         401:
           description: User was not authenticated.
-          content: { }
+          content: {}
         403:
           description: User does not have necessary permissions.
-          content: { }
+          content: {}
 components:
   schemas:
     meta_definition:
@@ -3120,35 +3120,10 @@ components:
       description: Payload which is to used to create signups to a registration
     create_signup_response:
       title: Create signups response
-      type: object
-      properties:
-        attending:
-          type: object
-          description: Persons attending to a registration
-          properties:
-            count:
-              type: integer
-              description: Amount of persons attending to a registration
-              example: 1
-            signups:
-              type: array
-              description: The list of persons attending to a registration
-              items:
-                $ref: "#/components/schemas/signup"
-        waitlisted:
-          type: object
-          description: Persons added to the waiting list
-          properties:
-            count:
-              type: integer
-              description: The number of persons added to the waiting list
-              example: 1
-            signups:
-              type: array
-              description: The list of persons added to the waiting list
-              items:
-                $ref: "#/components/schemas/signup"
+      type: array
       description: Response of the create signups request
+      items:
+        $ref: "#/components/schemas/signup"
     signup_group:
       title: Signup group
       type: object
@@ -3437,7 +3412,7 @@ components:
           description: Ids of signup groups whose responsible attendees will receive the email message
           items:
             type: integer
-          example: [ 1 ]
+          example: [1]
       description: Payload of the send message request.
     send_message_response:
       title: Send message response
@@ -3462,7 +3437,7 @@ components:
           description: Ids of the signup groups to whose responsible attendees the email was sent to.
           items:
             type: integer
-          example: [ 1 ]
+          example: [1]
         subject:
           type: string
           description: Subject of the sent email.
