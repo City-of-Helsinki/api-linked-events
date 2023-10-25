@@ -288,17 +288,17 @@ paths:
         <h4 id="show-keywords-with-upcoming-events">Show only keywords with the upcoming events</h4>
         <p>To show only the keywords which are used in the upcoming events supply the <code>has_upcoming_events</code> query parameter.</p>
         <p>For example:</p>
-        <pre><code>keyword/?has_upcoming_events=True</code></pre>
+        <pre><code>keyword/?has_upcoming_events=true</code></pre>
 
         <h4 id="showing-all-keyword">Showing all keywords</h4>
         <p>By default, only those keywords which have listed events are displayed. You may display keywords with zero <code>n_events</code> with the query parameter <code>show_all_keywords</code>.</p>
         <p>For example:</p>
-        <pre><code>keyword/?show_all_keywords=True</code></pre>
+        <pre><code>keyword/?show_all_keywords=true</code></pre>
 
         <h4 id="showing-deprecated-keyword">Showing deprecated keywords</h4>
         <p>By default, deprecated keywords are not displayed. You may also display deprecated keywords with the query parameter <code>show_deprecated</code>.</p>
         <p>For example:</p>
-        <pre><code>keyword/?show_deprecated=True</code></pre>
+        <pre><code>keyword/?show_deprecated=true</code></pre>
 
         <h4 id="ordering">Ordering</h4>
         <p>Default ordering is decreasing order by the number of events found. You may also order results by <code>name</code>.</p>
@@ -772,7 +772,7 @@ paths:
         <h4 id="showing-deleted-places">Showing deleted places</h4>
         <p>By default, deleted places are not displayed. You may also display deleted places with the query parameter <code>show_deleted</code>.</p>
         <p>For example:</p>
-        <pre><code>keyword/?show_deleted=True</code></pre>
+        <pre><code>place/?show_deleted=true</code></pre>
 
         <h4 id="ordering">Ordering</h4>
         <p>Default ordering is decreasing order by the number of events found. You may also order results by <code>name</code>, <code>street_address</code> or <code>postal_code</code>.</p>
@@ -1156,7 +1156,7 @@ paths:
         <h3 id="event-last-modified">Event last modification time</h3>
         <p>To find events that have changed since you last polled Linkedevents API (to e.g. update your event cache), it is best to use the query parameter <code>last_modified_since</code>. This allows you to only return data that has changed after your last update. You may also include events that have been deleted in the API in the results by using the <code>show_deleted</code> filter. This allows you to update your cache with all added, modified and deleted events without having to fetch *all* future events every time.</p>
         <p>Example:</p>
-        <pre><code>event/?last_modified_since=2020-04-07&show_deleted=True</code></pre>
+        <pre><code>event/?last_modified_since=2020-04-07&show_deleted=true</code></pre>
 
         <h3 id="event-ids">Specific ids</h3>
         <p>To find events that have specific id use parameter <code>ids</code>, separating values by commas if you wish to query for several event ids.</p>
@@ -1254,7 +1254,7 @@ paths:
         <pre><code>event/?registration=true</code></pre>
 
         <h3 id="enrolment">Open enrolment</h3>
-        <p>Two endpoints show the events that have connected registrations and have places either at the event itself <code>enrolment_open</code> or in the waiting lists <code>enrolment_open_waitlist</code>. Note that the latter query parameter when set to <code>True</code> returns also the events that have open spots at the event itself. Null values are regarded as unlimited number of spots at the event or in the waiting list.</p>
+        <p>Two endpoints show the events that have connected registrations and have places either at the event itself <code>enrolment_open</code> or in the waiting lists <code>enrolment_open_waitlist</code>. Note that the latter query parameter when set to <code>true</code> returns also the events that have open spots at the event itself. Null values are regarded as unlimited number of spots at the event or in the waiting list.</p>
         <p>For example:</p>
         <pre><code>event/?enrolment_open_waitilist=true</code></pre>
 
