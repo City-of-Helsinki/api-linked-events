@@ -606,12 +606,27 @@ paths:
         <p>Example:</p>
         <pre><code>organization/?parent=ahjo:100</code></pre>
         <p><a href="?parent=ahjo:100" title="json">See the result</a></p>
+
+        <h4 id="organization-dissolved">Dissolved organizations</h4>
+        <p>To filter organizations based on their dissolution date use the parameter <code>dissolved</code>.
+        The filter is boolean type and can be used to show only dissolved organizations (true) or exclude them (false).</p>
+
+        <p>Get only dissolved organizations</p>
+        <p>Example:</p>
+        <pre><code>organization/?dissolved=true</code></pre>
+        <p><a href="?dissolved=true" title="json">See the result</a></p>
+
+        <p>Get organizations not dissolved</p>
+        <p>Example:</p>
+        <pre><code>organization/?dissolved=false</code></pre>
+        <p><a href="?dissolved=false" title="json">See the result</a></p>
       operationId: organization_list
       parameters:
         - $ref: "#/components/parameters/page_param"
         - $ref: "#/components/parameters/pagesize_param"
         - $ref: "#/components/parameters/organization_child_param"
         - $ref: "#/components/parameters/organization_parent_param"
+        - $ref: "#/components/parameters/organization_dissolved_param"
       responses:
         200:
           description: List of organizations
@@ -2936,6 +2951,12 @@ components:
       description: Get all suborganizations and their descendants for the given organization id.
       schema:
         type: string
+    organization_dissolved_param:
+      name: dissolved
+      in: query
+      description: Get or exclude dissolved organizations; <code>true</code> shows only dissolved and <code>false</code> excludes dissolved organizations.
+      schema:
+        type: boolean
 
     place_data_source_param:
       name: data_source
