@@ -1845,7 +1845,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/signup"
+                      $ref: "#/components/schemas/signup_with_contact_person"
       parameters:
         - $ref: "#/components/parameters/page_param"
         - $ref: "#/components/parameters/pagesize_param"
@@ -1891,7 +1891,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/signup"
+                $ref: "#/components/schemas/signup_with_contact_person"
       parameters:
         - name: id
           in: path
@@ -1917,7 +1917,7 @@ paths:
         content:
           "*/*":
             schema:
-              $ref: "#/components/schemas/signup"
+              $ref: "#/components/schemas/signup_with_contact_person"
         required: false
       responses:
         200:
@@ -1925,7 +1925,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/signup"
+                $ref: "#/components/schemas/signup_with_contact_person"
         400:
           description:
             Input format was not correct, eg. mandatory field was missing
@@ -3040,24 +3040,9 @@ components:
           type: string
           description: The city of the attendee's address
           example: Helsinki
-        email:
-          type: string
-          description: Attendee´s email address
-          format: email
-        phone_number:
-          type: string
-          description: Attendee´s phone number
-          example: 0441234567
         extra_info:
           type: string
           description: Extra information about the attendee
-        membership_number:
-          type: string
-          description: Attendee´s membership number
-        notifications:
-          type: string
-          description: Methods to send notifications to the attendee. Options are "none", "sms", "email" and "sms and email".
-          example: sms and email
         attendee_status:
           type: string
           description: Status of the attendee. Options are "attending" and "waitlisted".
@@ -3067,14 +3052,6 @@ components:
           type: integer
           description: Id of the registration to which this signup is related
           readOnly: true
-        native_language:
-          type: string
-          description: Attendee´s native language
-          example: fi
-        service_language:
-          type: string
-          description: Attendee´s service language
-          example: fi
         created_time:
           type: string
           format: date-time
@@ -3093,9 +3070,20 @@ components:
           readOnly: true
         last_modified_by:
           type: string
-          description: URL reference to the user that last modfied this signup (user endpoint)
+          description: URL reference to the user that last modified this signup (user endpoint)
           readOnly: true
       description: Signups are used as attendees for registrations.
+    signup_with_contact_person:
+      title: Signup with contact person information
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/signup"
+        - properties:
+            contact_person:
+              type: object
+              description: Information of the attendee´s contact person.
+              $ref: "#/components/schemas/contact_person"
+      description: Signups are used as attendees for registrations. An attendee can have their own contact person information if they are not part of a group.
     create_signup_payload:
       title: Create signups payload
       type: object
@@ -3116,14 +3104,14 @@ components:
           type: array
           description: The list of persons to enrol to a registration
           items:
-            $ref: "#/components/schemas/signup"
+            $ref: "#/components/schemas/signup_with_contact_person"
       description: Payload which is to used to create signups to a registration
     create_signup_response:
       title: Create signups response
       type: array
       description: Response of the create signups request
       items:
-        $ref: "#/components/schemas/signup"
+        $ref: "#/components/schemas/signup_with_contact_person"
     signup_group:
       title: Signup group
       type: object
@@ -3166,6 +3154,10 @@ components:
           type: string
           description: URL reference to the user that last modfied this signup group (user endpoint)
           readOnly: true
+        contact_person:
+          type: object
+          description: Information of the group´s contact person.
+          $ref: "#/components/schemas/contact_person"
       description: Signups are used as attendees for registrations.
     create_signup_group_payload:
       title: Create signup group payload
@@ -3174,6 +3166,7 @@ components:
         - reservation_code
         - registration
         - signups
+        - contact_person
       properties:
         reservation_code:
           type: string
@@ -3183,6 +3176,10 @@ components:
           type: integer
           description: Id of the registration to which the user is going to signup a group
           example: 1
+        contact_person:
+          type: object
+          description: Information of the group´s contact person.
+          $ref: "#/components/schemas/contact_person"
         signups:
           type: array
           description: The list of persons to enrol to a registration as members of the same group
@@ -3223,8 +3220,50 @@ components:
           description: URL reference to the user that created this signup group (user endpoint)
         last_modified_by:
           type: string
-          description: URL reference to the user that last modfied this signup group (user endpoint)
+          description: URL reference to the user that last modified this signup group (user endpoint)
+        contact_person:
+          type: object
+          description: Information of the group´s contact person
+          $ref: "#/components/schemas/contact_person"
       description: Response of the create signup group request
+    contact_person:
+      title: Contact person
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this contact person
+          readOnly: true
+        first_name:
+          type: string
+          description: Contact person´s first name
+        last_name:
+          type: string
+          description: Contact person´s last name
+        email:
+          type: string
+          description: Contact person´s email address
+          format: email
+        phone_number:
+          type: string
+          description: Contact person´s phone number
+          example: 0441234567
+        native_language:
+          type: string
+          description: Contact person´s native language
+          example: fi
+        service_language:
+          type: string
+          description: Contact person´s service language
+          example: fi
+        membership_number:
+          type: string
+          description: Contact person´s membership number
+        notifications:
+          type: string
+          description: Methods to send notifications to the contact person. Options are "none", "sms", "email" and "sms and email".
+          example: sms and email
+      description: Provides contact information for an attendee or an attendee group. In case of a group, the information will be shared for the whole group.
     registration:
       title: Registration
       type: object
@@ -3403,13 +3442,13 @@ components:
           example: <p>Email message body</p>
         signups:
           type: array
-          description: Ids of attendees who will receive the email message
+          description: Ids of attendees whose contact persons will receive the email message
           items:
             type: integer
           example: [1]
         signup_groups:
           type: array
-          description: Ids of signup groups whose responsible attendees will receive the email message
+          description: Ids of signup groups whose contact persons will receive the email message
           items:
             type: integer
           example: [1]
@@ -3428,13 +3467,13 @@ components:
           example: Email message body
         signups:
           type: array
-          description: Ids of the attendees to whom the email was sent to.
+          description: Ids of the attendees to whose contact persons the email was sent to.
           items:
             type: integer
           example: [1]
         signup_groups:
           type: array
-          description: Ids of the signup groups to whose responsible attendees the email was sent to.
+          description: Ids of the signup groups to whose contact persons the email was sent to.
           items:
             type: integer
           example: [1]
@@ -4013,7 +4052,7 @@ components:
     signup_text_param:
       name: text
       in: query
-      description: Search (case insensitive) through text fields (name, email, membership_number and phone_number) of a signup.
+      description: Search (case insensitive) through the text fields of a signup (first_name, last_name) and the signup's contact person (email, membership_number and phone_number).
       schema:
         type: string
     signup_attendee_status_param:
@@ -4032,7 +4071,7 @@ components:
     signup_group_text_param:
       name: text
       in: query
-      description: Search (case insensitive) through text fields (name, email,  membership_number and phone_number) of signups in a signup group.
+      description: Search (case insensitive) through the text fields of signups (first_name, last_name) and the contact person (email, membership_number and phone_number) in a signup group.
       schema:
         type: string
     signup_group_attendee_status_param:
