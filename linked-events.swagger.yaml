@@ -1747,6 +1747,45 @@ paths:
           description: Sending email message failed.
           content: {}
       x-codegen-request-body-name: send_message_object
+  /registration/{id}/signups/export/xlsx/:
+    get:
+      operationId: registration_signups_export_xlsx
+      tags:
+        - registration
+      summary: Export registration attendees as an XLSX file
+      description: Registration attendees XLSX export can be made if the user has appropriate access permissions.
+      parameters:
+        - name: id
+          in: path
+          description: The identifier of the registration whose attendees should be exported as an XLSX file
+          required: true
+          schema:
+            type: integer
+        - name: ui_language
+          in: query
+          description: UI language locale. Can be either "fi", "sv" or "en". Defaults to "fi" if no value given.
+          schema:
+            type: string
+      responses:
+        200:
+          description: XLSX file has been successfully created.
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: Invalid UI language locale.
+          content: {}
+        401:
+          description: User was not authenticated.
+          content: {}
+        403:
+          description: User does not have necessary permissions.
+          content: {}
+        404:
+          description: Registration not found.
+          content: {}
   /seats_reservation/:
     post:
       tags:
