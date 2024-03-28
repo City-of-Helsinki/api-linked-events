@@ -1279,6 +1279,15 @@ paths:
         <p>Two endpoints show the events that have connected registrations and have places either at the event itself <code>enrolment_open</code> or in the waiting lists <code>enrolment_open_waitlist</code>. Note that the latter query parameter when set to <code>true</code> returns also the events that have open spots at the event itself. Null values are regarded as unlimited number of spots at the event or in the waiting list.</p>
         <p>For example:</p>
         <pre><code>event/?enrolment_open_waitilist=true</code></pre>
+        
+        <h3 id="enrolment-open-on">Enrolment open on a given date</h3>
+        <p>It is possible to check if a given datetime is within events' enrolment start and end times. In other words,
+            if any events are open on a given date and time. The given datetime is expected to be in the events' timezone.</p>
+        <p><code>enrolment_open_on</code> parameter displays events where the given datetime is within the
+            <code>enrolment_start_time</code> and <code>enrolment_end_time</code> of the events. If an event
+            has a registration, the registration's enrolment start and end times will be preferred over the event's times.</p>
+        <p>For example:</p>
+        <pre><code>event/?enrolment_open_on=2024-02-19T12:00:00</code></pre>
 
         <h3 id="attendee-capacity">Attendee capacity</h3>
         <p>Filters for filtering by event maximum_attendee_capacity and minimum_attendee_capacity:</p>
@@ -1308,6 +1317,39 @@ paths:
             or equal the applied parameter (integer value)</p>
         <p>Example:</p>
         <pre><code>event/?minimum_attendee_capacity_lte=10</code></pre>
+        
+        <h3 id="remaining-attendee-capacity">Remaining registration attendee or waiting list capacity</h3>
+        <p>Filters for filtering by registration remaining_attendee_capacity and remaining_waiting_list_capacity:</p>
+
+        <h4>Filtering for registration remaining_attendee_capacity</h4>
+        <p>It is possible to filter by registration remaining_attendee_capacity using gte (>=) or isnull filters.</p>
+
+        <p><code>registration__remaining_attendee_capacity__gte</code> parameter displays events where registration's
+            remaining attendee capacity is greater than or equal the applied parameter (integer value)</p>
+        <p>Example:</p>
+        <pre><code>event/?registration__remaining_attendee_capacity__gte=10</code></pre>
+
+        <p><code>registration__remaining_attendee_capacity__isnull</code> parameter displays events where registration's
+            remaining attendee capacity is or is not NULL</p>
+        <p>The values <code>True</code>, <code>true</code> and <code>1</code> are all considered to be "true".</p>
+        <p>The values <code>False</code>, <code>false</code> and <code>0</code> are all considered to be "false".</p>
+        <p>Example:</p>
+        <pre><code>event/?registration__remaining_attendee_capacity__isnull=true</code></pre>
+
+        <h4>Filtering for registration remaining_waiting_list_capacity</h4>
+        <p>It is possible to filter by registration remaining_waiting_list_capacity using gte (>=) or isnull filters.</p>
+
+        <p><code>registration__remaining_waiting_list_capacity__gte</code> parameter displays events where registration's
+            remaining waiting list capacity is greater than or equal the applied parameter (integer value)</p>
+        <p>Example:</p>
+        <pre><code>event/?registration__remaining_waiting_list_capacity__gte=10</code></pre>
+
+        <p><code>registration__remaining_waiting_list_capacity__isnull</code> parameter displays events where registration's
+            remaining waiting list capacity is or is not NULL</p>
+        <p>The values <code>True</code>, <code>true</code> and <code>1</code> are all considered to be "true".</p>
+        <p>The values <code>False</code>, <code>false</code> and <code>0</code> are all considered to be "false".</p>
+        <p>Example:</p>
+        <pre><code>event/?registration__remaining_waiting_list_capacity__isnull=true</code></pre>
 
         <h3 id="event-for-authenticated-users">Filtering for authenticated users</h3>
         <p>By default, only public events are shown in the event list. However, certain query parameters allow customizing the listing for authenticated users</p>
@@ -1340,9 +1382,20 @@ paths:
         <pre><code>event/?include=location,keywords</code></pre>
 
         <h2 id="ordering">Ordering</h2>
-        <p>Default ordering is descending order by <code>-last_modified_time</code>. You may also order  results by <code>start_time</code>, <code>end_time</code>, <code>name</code> and <code>duration</code>. Descending order is denoted by adding <code>-</code> in front of the parameter, default order is ascending.</p>
+        <p>Default ordering is descending order by <code>-last_modified_time</code>. You may also order  results by <code>start_time</code>, <code>end_time</code>, <code>name</code>, <code>duration</code>, <code>enrolment_start_time</code>, <code>enrolment_end_time</code>, <code>registration__enrolment_start_time</code>, <code>registration__enrolment_end_time</code>, <code>enrolment_start</code> and <code>enrolment_end</code>. Descending order is denoted by adding <code>-</code> in front of the parameter, default order is ascending.</p>
         <p>For example:</p>
         <pre><code>event/?sort=-end_time</code></pre>
+        
+        <h3 id="enrolment-start-enrolment-end">Enrolment start and enrolment end</h3>
+        <p>The ordering filters <code>enrolment_start</code> and <code>enrolment_end</code> have two
+            notable differences compared to the rest of the ordering filters related to enrolment start
+            and enrolment end times:</p>
+        <p>First, if an event has a registration with an enrolment time defined, the registration's time
+            will be preferred over the event's time.</p>
+        <p>Second, if neither the event's registration nor the event has enrolment times defined
+            (<code>enrolment_start_time</code> and <code>enrolment_end_time</code> are both NULL), the
+            event will be placed at the end of the results list regardless of whether ascending or
+            descending order was used.</p>
       operationId: Event_list
       parameters:
         - $ref: "#/components/parameters/page_param"
@@ -1397,11 +1450,16 @@ paths:
         - $ref: "#/components/parameters/event_hide_recurring_children_param"
         - $ref: "#/components/parameters/event_registration_param"
         - $ref: "#/components/parameters/event_enrolment_open_param"
+        - $ref: "#/components/parameters/event_enrolment_open_on_param"
         - $ref: "#/components/parameters/event_enrolment_open_waitlist_param"
         - $ref: "#/components/parameters/event_maximum_attendee_capacity_gte_param"
         - $ref: "#/components/parameters/event_maximum_attendee_capacity_lte_param"
         - $ref: "#/components/parameters/event_minimum_attendee_capacity_gte_param"
         - $ref: "#/components/parameters/event_minimum_attendee_capacity_lte_param"
+        - $ref: "#/components/parameters/event_registration_remaining_attendee_capacity_gte_param"
+        - $ref: "#/components/parameters/event_registration_remaining_attendee_capacity_isnull_param"
+        - $ref: "#/components/parameters/event_registration_remaining_waiting_list_capacity_gte_param"
+        - $ref: "#/components/parameters/event_registration_remaining_waiting_list_capacity_isnull_param"
         - $ref: "#/components/parameters/event_show_all_param"
         - $ref: "#/components/parameters/event_publication_status_param"
         - $ref: "#/components/parameters/event_admin_user_param"
@@ -3696,6 +3754,12 @@ components:
       description: Search for events that have connected registrations and have places at the event.
       schema:
         type: boolean
+    event_enrolment_open_on_param:
+      name: enrolment_open_on
+      in: query
+      description: Search for events where enrolment is open on a given date or datetime.
+      schema:
+        type: string
     event_enrolment_open_waitlist_param:
       name: enrolment_open_waitlist
       in: query
@@ -3847,6 +3911,30 @@ components:
       description: Search for events events with minimum attendee capacity less than or equal the applied parameter.
       schema:
         type: integer
+    event_registration_remaining_attendee_capacity_gte_param:
+      name: registration__remaining_attendee_capacity__gte
+      in: query
+      description: Search for events where the remaining registration attendee capacity is greater than or equal to the applied parameter.
+      schema:
+        type: integer
+    event_registration_remaining_attendee_capacity_isnull_param:
+      name: registration__remaining_attendee_capacity__isnull
+      in: query
+      description: Search for events where the remaining registration attendee capacity is or is not NULL.
+      schema:
+        type: boolean
+    event_registration_remaining_waiting_list_capacity_gte_param:
+      name: registration__remaining_waiting_list_capacity__gte
+      in: query
+      description: Search for events where the remaining registration waiting_list capacity is greater than or equal to the applied parameter.
+      schema:
+        type: integer
+    event_registration_remaining_waiting_list_capacity_isnull_param:
+      name: registration__remaining_waiting_list_capacity__isnull
+      in: query
+      description: Search for events where the remaining registration waiting_list capacity is or is not NULL.
+      schema:
+        type: boolean
     event_min_duration_param:
       name: min_duration
       in: query
@@ -3894,7 +3982,7 @@ components:
     event_sort_param:
       name: sort
       in: query
-      description: Sort the returned events in the given order. Possible sorting criteria are 'start_time', 'end_time', 'duration' and 'last_modified_time'. The default ordering is '-last_modified_time'.
+      description: Sort the returned events in the given order. Possible sorting criteria are 'start_time', 'end_time', 'name', 'duration', 'last_modified_time', 'enrolment_start_time', 'enrolment_end_time', 'registration__enrolment_start_time', 'registration__enrolment_end_time', 'enrolment_start' and 'enrolment_end'. The default ordering is '-last_modified_time'.
       schema:
         type: string
     event_start_param:
