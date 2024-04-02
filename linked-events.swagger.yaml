@@ -943,12 +943,20 @@ paths:
     get:
       tags:
         - language
-      summary: Return a list of languages used for describing events
-      description: The returned list describes languages used for describing events in this Linked events instance.
+      summary: Return a list of languages used for describing events and registrations
+      description: |
+        <h2 id="using-language-endpoint">Using the language endpoint</h2>
+        <p>Returns the list of languages used for describing events and registrations in this Linked events instance. The languages are also used when translating the user interface and email messages for end-users.</p>
+        
+        <h4 id="showing-service-languages">Showing service languages</h4>
+        <p>By default, all languages are shown. To show only service languages or languages that are not service languages, you can use the boolean parameter <code>service_language</code>.</p>
+        <p>For example:</p>
+        <pre><code>language/?service_language=true</code></pre>
       operationId: language_list
       parameters:
         - $ref: "#/components/parameters/page_param"
         - $ref: "#/components/parameters/pagesize_param"
+        - $ref: "#/components/parameters/language_service_language_param"
       responses:
         200:
           description: Language list
@@ -4142,6 +4150,13 @@ components:
       description: Sort the returned keyword sets in the given order. Possible sorting criteria are <code>name</code>, <code>usage</code> and <code>data_source</code>.
       schema:
         type: string
+
+    language_service_language_param:
+      name: service_language
+      in: query
+      description: Show only service languages or languages that are not service languages.
+      schema:
+        type: boolean
 
     organization_child_param:
       name: child
