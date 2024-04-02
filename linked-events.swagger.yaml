@@ -1947,6 +1947,11 @@ paths:
         <p>You may use the query parameter <code>attendee_status</code>, comma separated, to get only signups with specific attendee status.
         <p>Example:</p>
         <pre><code>signup/?attendee_status=attending</code></pre>
+        
+        <h3 id="signup-ordering">Ordering</h3>
+        <p>Default ordering is ascending alphabetical order primarily by <code>first_name</code> and secondarily by <code>last_name</code> which are also the only ordering parameters currently. Descending order is denoted by adding <code>-</code> in front of a parameter.</p>
+        <p>Example:</p>
+        <pre><code>signup/?sort=-first_name</code></pre>
       operationId: Signup_list
       tags:
         - signup
@@ -1970,6 +1975,7 @@ paths:
         - $ref: "#/components/parameters/signup_registration_param"
         - $ref: "#/components/parameters/signup_text_param"
         - $ref: "#/components/parameters/signup_attendee_status_param"
+        - $ref: "#/components/parameters/signup_sort_param"
     post:
       summary: Create new signups to the registration
       operationId: signup_create
@@ -4222,6 +4228,12 @@ components:
       name: attendee_status
       in: query
       description: Search for signups with the given attendee status. Multiple types are separated by comma.
+      schema:
+        type: string
+    signup_sort_param:
+      name: sort
+      in: query
+      description: Sort the returned signups in the given order. Possible sorting criteria are 'first_name' and 'last_name'. The default ordering is 'first_name,last_name'.
       schema:
         type: string
 
