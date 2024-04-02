@@ -128,6 +128,11 @@ paths:
         <p>To find out images that originate from a specific source system, use the query parameter <code>data_source</code>, separating values by commas if you wish to query for several data sources.</p>
         <p>Example:</p>
         <pre><code>image/?data_source=helmet</code></pre>
+        
+        <h3 id="image-created-by">Images created by the authenticated user</h3>
+        <p>To find out images that have been created by the current authenticated user, use the parameter <code>created_by</code>.</p>
+        <p>Example:</p>
+        <pre><code>image/?created_by=true</code></pre>
 
         <h4 id="ordering">Ordering</h4>
         <p>Default ordering is descending order by <code>-last_modified_time</code>. You may also order results by <code>id</code> and <code>name</code>.</p>
@@ -141,6 +146,7 @@ paths:
         - $ref: "#/components/parameters/image_text_param"
         - $ref: "#/components/parameters/image_publisher_param"
         - $ref: "#/components/parameters/image_data_source_param"
+        - $ref: "#/components/parameters/image_created_by_param"
         - $ref: "#/components/parameters/image_sort_param"
 
       responses:
@@ -4048,6 +4054,12 @@ components:
       schema:
         type: string
 
+    image_created_by_param:
+      name: created_by
+      in: query
+      description: Search for images created by the authenticated user.
+      schema:
+        type: boolean
     image_data_source_param:
       name: data_source
       in: query
