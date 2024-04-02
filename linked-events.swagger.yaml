@@ -3501,15 +3501,18 @@ components:
       properties:
         id:
           type: integer
-          description: Unique identifier for this registration
+          description: Unique identifier for this registration.
           readOnly: true
         email:
           type: string
-          description: Email address of the registration user
+          description: Email address of the registration user. Must end with one of the allowed domain names if "is_substitute_user" is set to True (by default, only "hel.fi" domain is allowed).
         language:
           type: string
           description: The registration user's service language that should be used in invitation emails.
           example: fi
+        is_substitute_user:
+          type: boolean
+          description: Determines if the registration user is a substitute user for the creator of the registration. A substitute user has full administration rights for the registration. The registration user's email must end with an allowed domain name to be able to set this to True. By default, only "hel.fi" domain is allowed.
       description: List of email addresses which has registration specific permissions.
     seats_reservation:
       title: Seat reservation
