@@ -2308,9 +2308,11 @@ components:
       properties:
         id:
           type: string
+          maxLength: 100
           description: Consists of source prefix and source specific identifier. These should be URIs uniquely identifying the place, and preferably also well formed http-URLs pointing to more information about the place.
         origin_id:
           type: string
+          maxLength: 100
           description: Place identifier in the originating system. Same as id but without the data source prefix.
         data_source:
           type: string
@@ -2351,22 +2353,28 @@ components:
                 type: string
         email:
           type: string
+          maxLength: 254
           description: Contact email for the place, note that this is NOT multilingual
         contact_type:
           type: string
+          maxLength: 255
           description: |
             FIXME: this seems unused in Helsinki data. Does any 6Aika city have use for describing contact type?
         address_region:
           type: string
+          maxLength: 255
           description: Larger region for address (like states), not typically used in Finland
         postal_code:
           type: string
+          maxLength: 128
           description: Postal code of the location (as used by traditional mail)
         post_office_box_num:
           type: string
+          maxLength: 128
           description: PO box for traditional mail, in case mail is not delivered to the building
         address_country:
           type: string
+          maxLength: 2
           description: Country for the place, NOT multilingual
         deleted:
           type: boolean
@@ -2404,11 +2412,49 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
               description: Name of the place, multilingual
         street_address:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
               description: Street address for the place, multilingual
         info_url:
           allOf:
@@ -2416,16 +2462,28 @@ components:
             - type: object
               properties:
                 fi:
+                  type: string
+                  maxLength: 1000
                   format: url
                 sv:
+                  type: string
+                  maxLength: 1000
                   format: url
                 en:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ar:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ru:
+                  type: string
+                  maxLength: 1000
                   format: url
                 zh_hans:
+                  type: string
+                  maxLength: 1000
                   format: url
               description: Link (URL) to a page with more information about place
         description:
@@ -2438,11 +2496,49 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
               description: Describes where the address is located, typically this would be name of the city.
         telephone:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 128
+                sv:
+                  type: string
+                  maxLength: 128
+                en:
+                  type: string
+                  maxLength: 128
+                ar:
+                  type: string
+                  maxLength: 128
+                ru:
+                  type: string
+                  maxLength: 128
+                zh_hans:
+                  type: string
+                  maxLength: 128
               description: Contact phone number for the place, multilingual
       description: Places describe physical locations for events and means for contacting people responsible for these locations. Place definitions come from organizations publishing events (field "publisher") and can thus have slightly different semantics between places sourced from different organizations.
     image:
@@ -2480,15 +2576,19 @@ components:
           readOnly: true
         name:
           type: string
+          maxLength: 255
           description: Image description
         url:
           type: string
+          maxLength: 400
+          format: url
           description: The image file URL
         cropping:
           type: string
           description: Cropping data for the image
         photographer_name:
           type: string
+          maxLength: 255
           description: Photographer of the image
         data_source:
           type: string
@@ -2502,6 +2602,25 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 320
+                sv:
+                  type: string
+                  maxLength: 320
+                en:
+                  type: string
+                  maxLength: 320
+                ar:
+                  type: string
+                  maxLength: 320
+                ru:
+                  type: string
+                  maxLength: 320
+                zh_hans:
+                  type: string
+                  maxLength: 320
               description: The image alt text, multilingual.
       description: Images are used as pictures for events, places and organizers.
     organization:
@@ -2514,9 +2633,11 @@ components:
       properties:
         id:
           type: string
+          maxLength: 255
           description: Consists of source prefix and source specific identifier. These should be URIs uniquely identifying the organization, and preferably also well formed http-URLs pointing to more information about the organization.
         origin_id:
           type: string
+          maxLength: 255
           description:
             Identifier for the organization in the original data source.
             For standardized namespaces this will be a shared identifier.
@@ -2530,6 +2651,7 @@ components:
           description: Id of the organization type
         name:
           type: string
+          maxLength: 255
           description: The name of the organization
         founding_date:
           type: string
@@ -2583,12 +2705,10 @@ components:
         - type: object
           required:
             - origin_id
-            - admin_users
-            - registration_admin_users
-            - regular_users
           properties:
             origin_id:
               type: string
+              maxLength: 255
               description:
                 Identifier for the organization in the data source of this organization.
                 For standardized namespaces this will be a shared identifier.
@@ -2628,9 +2748,11 @@ components:
       properties:
         id:
           type: string
+          maxLength: 100
           description: Identifier of the data source
         name:
           type: string
+          maxLength: 255
           description: Identifier of the data source
         user_editable_resources:
           type: boolean
@@ -2662,9 +2784,11 @@ components:
       properties:
         id:
           type: string
+          maxLength: 255
           description: Consists of source prefix and source specific identifier.
         name:
           type: string
+          maxLength: 255
           description: The name of the organization class
         created_time:
           type: string
@@ -2688,9 +2812,11 @@ components:
       properties:
         id:
           type: string
+          maxLength: 100
           description: Consists of source prefix and source specific identifier. These should be URIs uniquely identifying the keyword, and preferably also well formed http-URLs pointing to more information about the keyword.
         origin_id:
           type: string
+          maxLength: 100
           description:
             Identifier for the keyword in the organization using this keyword.
             For standardized namespaces this will be a shared identifier.
@@ -2748,6 +2874,25 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
               description: Keyword name, multilingual
       description: |
         Keywords are used to describe events. Linked events uses namespaced
@@ -2767,10 +2912,12 @@ components:
       properties:
         id:
           type: string
+          maxLength: 100
           description: Unique identifier for this keyword set.
             These should be URIs identifying the source and the keyword set itself, and preferably also well formed http-URLs pointing to more information about the keyword.
         origin_id:
           type: string
+          maxLength: 100
           description: Set identifier in the originating system, if any
         keywords:
           type: array
@@ -2816,6 +2963,25 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
           description: Name for this keyword set, multilingual. This should be human readable, such that it could be shown as label in UI.
       description: Keyword sets are used to group keywords together into classification groups. For example, one set of keywords might describe themes used by an event provider and another could be used to describe audience groups.
     language:
@@ -2827,6 +2993,7 @@ components:
       properties:
         id:
           type: string
+          maxLength: 10
           description: Identifier for the language (typically ISO639-1)
         translation_available:
           type: boolean
@@ -2838,6 +3005,25 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 20
+                sv:
+                  type: string
+                  maxLength: 20
+                en:
+                  type: string
+                  maxLength: 20
+                ar:
+                  type: string
+                  maxLength: 20
+                ru:
+                  type: string
+                  maxLength: 20
+                zh_hans:
+                  type: string
+                  maxLength: 20
           description: Translation for the language name. Properties shown here are examples, it is suggested that every language supported has its name translated to every other language. Users of the API cannot rely on any translations being present.
       description: Primary purpose of this endpoint is to allow users to identify which languages are supported for multilingual fields. It also has translations for the names of the languages.
     event:
@@ -2959,18 +3145,22 @@ components:
             Key value field for custom data.
         user_name:
           type: string
+          maxLength: 50
           description: |
             Name of the external user.
         user_email:
           type: string
+          maxLength: 254
           description: |
             Email of the external user.
         user_phone_number:
           type: string
+          maxLength: 18
           description: |
             Phone number of the external user.
         user_organization:
           type: string
+          maxLength: 255
           description: |
             Organization of the external user.
         user_consent:
@@ -2985,6 +3175,7 @@ components:
             - out
         environmental_certificate:
           type: string
+          maxLength: 255
           description: |
             Url of the environmental certificate.
         audience_min_age:
@@ -3035,32 +3226,101 @@ components:
             - type: object
               properties:
                 fi:
+                  type: string
+                  maxLength: 1000
                   format: url
                 sv:
+                  type: string
+                  maxLength: 1000
                   format: url
                 en:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ar:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ru:
+                  type: string
+                  maxLength: 1000
                   format: url
                 zh_hans:
+                  type: string
+                  maxLength: 1000
                   format: url
               description: Link (URL) to a page with more information about event
         name:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 255
+                sv:
+                  type: string
+                  maxLength: 255
+                en:
+                  type: string
+                  maxLength: 255
+                ar:
+                  type: string
+                  maxLength: 255
+                ru:
+                  type: string
+                  maxLength: 255
+                zh_hans:
+                  type: string
+                  maxLength: 255
               description: Short descriptive name for the event, recommended limit 80 characters
         provider:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 512
+                sv:
+                  type: string
+                  maxLength: 512
+                en:
+                  type: string
+                  maxLength: 512
+                ar:
+                  type: string
+                  maxLength: 512
+                ru:
+                  type: string
+                  maxLength: 512
+                zh_hans:
+                  type: string
+                  maxLength: 512
               description: Description of who is responsible for the practical implementation of the event
         location_extra_info:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 400
+                sv:
+                  type: string
+                  maxLength: 400
+                en:
+                  type: string
+                  maxLength: 400
+                ar:
+                  type: string
+                  maxLength: 400
+                ru:
+                  type: string
+                  maxLength: 400
+                zh_hans:
+                  type: string
+                  maxLength: 400
               description: Unstructured extra info about location (like "eastern door of railway station")
         short_description:
           allOf:
@@ -3076,6 +3336,25 @@ components:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 10000
+                sv:
+                  type: string
+                  maxLength: 10000
+                en:
+                  type: string
+                  maxLength: 10000
+                ar:
+                  type: string
+                  maxLength: 10000
+                ru:
+                  type: string
+                  maxLength: 10000
+                zh_hans:
+                  type: string
+                  maxLength: 10000
               description: Provide's contact information, multilingual
       description: |
         Describes the actual events. Linked events API supports organizing
@@ -3106,34 +3385,70 @@ components:
             - type: object
               properties:
                 fi:
+                  type: string
+                  maxLength: 1000
                   format: url
                 sv:
+                  type: string
+                  maxLength: 1000
                   format: url
                 en:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ar:
+                  type: string
+                  maxLength: 1000
                   format: url
                 ru:
+                  type: string
+                  maxLength: 1000
                   format: url
                 zh_hans:
+                  type: string
+                  maxLength: 1000
                   format: url
               description: Link (URL) to a page with more information about offer
         price:
           allOf:
             - $ref: "#/components/schemas/multilingual_object"
             - type: object
+              properties:
+                fi:
+                  type: string
+                  maxLength: 1000
+                sv:
+                  type: string
+                  maxLength: 1000
+                en:
+                  type: string
+                  maxLength: 1000
+                ar:
+                  type: string
+                  maxLength: 1000
+                ru:
+                  type: string
+                  maxLength: 1000
+                zh_hans:
+                  type: string
+                  maxLength: 1000
               description: Price of the event. These are not bare numbers but instead descriptions of the pricing scheme.
 
       description: Information record for this event. The prices are not in a structured format and the format depends on information source. An exception to this is the case of free event. These are indicated using is_free flag, which is searchable.
     eventlink:
       title: Link to related information
       type: object
+      required:
+        - link
+        - language
       properties:
         name:
           type: string
+          maxLength: 100
           description: Name describing contents of the link
         link:
           type: string
+          maxLength: 200
           description: link to an external related entity
         language:
           type: string
@@ -3142,45 +3457,55 @@ components:
     video:
       title: Event video
       type: object
+      required:
+        - url
       properties:
         name:
           type: string
+          maxLength: 255
           description: Name describing contents of the video
         url:
           type: string
+          maxLength: 200
           description: Url to a video
         alt_text:
           type: string
+          maxLength: 320
           description: The video alt text
       description: Links to videos that the event publisher considers related to this event.
     signup:
       title: Signup
       type: object
-      required:
-        - notifications
       properties:
         id:
           type: integer
           description: Unique identifier for this signup
           readOnly: true
-        name:
+        first_name:
           type: string
-          description: Attendee´s name
-          example: User´s name
+          maxLength: 50
+          description: Attendee´s first name
+        last_name:
+          type: string
+          maxLength: 50
+          description: Attendee´s last name
         date_of_birth:
           type: string
           description: Attendee´s birth date
           format: date
         street_address:
           type: string
+          maxLength: 500
           description: The street address of the attendee's address
           example: Test address
         zipcode:
           type: string
+          maxLength: 10
           description: The postal number of the attendee's address
           example: 00100
         city:
           type: string
+          maxLength: 50
           description: The city of the attendee's address
           example: Helsinki
         extra_info:
@@ -3188,9 +3513,14 @@ components:
           description: Extra information about the attendee
         attendee_status:
           type: string
+          maxLength: 25
           description: Status of the attendee. Options are "attending" and "waitlisted".
-          readOnly: true
           example: attending
+        presence_status:
+          type: string
+          maxLength: 25
+          description: Event presence status of the attendee. Options are "present" and "not_present".
+          example: present
         registration:
           type: integer
           description: Id of the registration to which this signup is related
@@ -3258,8 +3588,6 @@ components:
     signup_group:
       title: Signup group
       type: object
-      required:
-        - notifications
       properties:
         id:
           type: integer
@@ -3324,7 +3652,7 @@ components:
           description: Information of the group´s contact person.
           $ref: "#/components/schemas/contact_person"
         signups:
-          type: array
+          type: arrays
           description: The list of persons to enrol to a registration as members of the same group
           items:
             $ref: "#/components/schemas/signup"
@@ -3379,16 +3707,20 @@ components:
           readOnly: true
         first_name:
           type: string
+          maxLength: 50
           description: Contact person´s first name
         last_name:
           type: string
+          maxLength: 50
           description: Contact person´s last name
         email:
           type: string
+          maxLength: 254
           description: Contact person´s email address
           format: email
         phone_number:
           type: string
+          maxLength: 18
           description: Contact person´s phone number
           example: 0441234567
         native_language:
@@ -3401,9 +3733,11 @@ components:
           example: fi
         membership_number:
           type: string
+          maxLength: 50
           description: Contact person´s membership number
         notifications:
           type: string
+          maxLength: 25
           description: Methods to send notifications to the contact person. Options are "none", "sms", "email" and "sms and email".
           example: sms and email
       description: Provides contact information for an attendee or an attendee group. In case of a group, the information will be shared for the whole group.
@@ -3412,7 +3746,6 @@ components:
       type: object
       required:
         - event
-        - mandatory_fields
       properties:
         id:
           type: integer
@@ -3496,6 +3829,7 @@ components:
           example: 5
         maximum_group_size:
           type: integer
+          minimum: 1
           description: Maximum number of people allowed to register per group
           example: 3
         confirmation_message:
@@ -3513,6 +3847,7 @@ components:
           description: Mandatory fields in the enrolment form.
           items:
             type: string
+            maxLength: 16
           example: ["name", "street_address", "zipcode", "city"]
         registration_user_accesses:
           type: array
@@ -3523,6 +3858,8 @@ components:
     registration_user_access:
       title: Registration user accesses
       type: object
+      required:
+        - email
       properties:
         id:
           type: integer
@@ -3530,7 +3867,8 @@ components:
           readOnly: true
         email:
           type: string
-          description: Email address of the registration user. Must end with one of the allowed domain names if "is_substitute_user" is set to True (by default, only "hel.fi" domain is allowed).
+          maxLength: 254
+          description: Email address of the registration user. Unique per registration. Must end with one of the allowed domain names if "is_substitute_user" is set to True (by default, only "hel.fi" domain is allowed).
         language:
           type: string
           description: The registration user's service language that should be used in invitation emails.
