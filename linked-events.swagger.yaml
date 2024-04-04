@@ -3652,7 +3652,7 @@ components:
           description: Information of the group´s contact person.
           $ref: "#/components/schemas/contact_person"
         signups:
-          type: arrays
+          type: array
           description: The list of persons to enrol to a registration as members of the same group
           items:
             $ref: "#/components/schemas/signup"
