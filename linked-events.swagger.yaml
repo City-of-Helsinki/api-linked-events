@@ -38,6 +38,8 @@ tags:
     description: Get supported data sources
   - name: organization class
     description: Get supported organization classes
+  - name: price group
+    description: Create, edit and search customer group selections
   - name: registration
     description: Search and edit registrations
   - name: seats reservation
@@ -1642,6 +1644,173 @@ paths:
         403:
           description: User does not have necessary permissions.
           content: {}
+  /price_group/:
+    get:
+      summary: Return a list of customer groups
+      description: |-
+        <h2 id="filtering-retrieved-customer-groups">Filtering retrieved customer groups</h2>
+        <p>Query parameters can be used to filter the retrieved customer groups by the following criteria.</p>
+        
+        <h3 id="customer-group-publisher">Publisher</h3>
+        <p>To find out customer groups that belong to a specific organization or that are default customer groups available to all organizations, use the query parameter <code>publisher</code>, separating values by commas if you wish to query for several publishers.</p>
+        <p>Existing organizations are found at the <code>organization</code> endpoint. City of Helsinki internal publishers have ids of the form <code>ahjo:origin_id</code> as they originate from the Helsinki Ahjo decisionmaking system, and have a rather complex hierarchy. External publishers may have their own namespaces, ids and hierarchies.</p>
+        <p>The id <code>none</code> can be used for default customer groups that do not belong to any specific organization. This id can be combined with actual organization ids using the comma separator.</p>
+        <p>Example:</p>
+        <pre><code>event/?publisher=ytj:0586977-6</code></pre>
+        <pre><code>event/?publisher=none</code></pre>
+        
+        <h3 id="customer-group-description">Description</h3>
+        <p>To find out customer groups that contain a specific string in the "description" field, use the query parameter <code>description</code>.</p>
+        <p>Example:</p>
+        <pre><code>price_group/?description=adult</code></pre>
+        
+        <h3 id="customer-group-is-free">Is free</h3>
+        <p>To find out customer groups that are free of charge or vice versa, use the query parameter<code>is_free</code>.</p>
+        <p>Example:</p>
+        <pre><code>price_group/?is_free=true</code></pre>
+      operationId: price_group_list
+      tags:
+        - price group
+      responses:
+        200:
+          description: List of customer groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: "#/components/schemas/meta_definition"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/price_group"
+      parameters:
+        - $ref: "#/components/parameters/page_param"
+        - $ref: "#/components/parameters/pagesize_param"
+        - $ref: "#/components/parameters/price_group_publisher_param"
+        - $ref: "#/components/parameters/price_group_description_param"
+        - $ref: "#/components/parameters/price_group_is_free_param"
+    post:
+      summary: Create a new customer group
+      operationId: price_group_create
+      requestBody:
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/price_group"
+        required: false
+      tags:
+        - price group
+      responses:
+        201:
+          description: Customer group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/price_group"
+        400:
+          description: Input format was not correct, eg. mandatory field was missing or JSON was malformed.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
+  /price_group/{id}/:
+    get:
+      summary: Return information for a single customer group
+      operationId: price_group_retrieve
+      tags:
+        - price group
+      responses:
+        200:
+          description: Single customer group object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/price_group"
+        401:
+          description: User was not authenticated.
+          content: { }
+        404:
+          description: Customer group does not exist.
+          content: { }
+      parameters:
+        - name: id
+          in: path
+          description: Customer group identifier as defined in the customer group schema
+          required: true
+          schema:
+            type: integer
+    put:
+      tags:
+        - price group
+      summary: Update a customer group
+      description: Customer group can be updated if the user has appropriate access permissions. Default customer groups cannot be updated.
+      operationId: price_group_update
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for the customer group to be updated
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Customer group object with updated data
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/price_group"
+        required: false
+      responses:
+        200:
+          description: Customer group has been successfully replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/price_group"
+        400:
+          description:
+            Input format was not correct, eg. mandatory field was missing
+            or JSON was malformed.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
+        404:
+          description: Customer group does not exist.
+          content: { }
+    delete:
+      tags:
+        - price group
+      summary: Delete a customer group
+      description: Customer group can be deleted if the user has appropriate access permissions. Default customer groups cannot be deleted.
+      operationId: price_group_delete
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for the customer group to be deleted
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Customer group has been successfully deleted.
+          content: { }
+        401:
+          description: User was not authenticated.
+          content: { }
+        403:
+          description: User does not have necessary permissions.
+          content: { }
+        404:
+          description: Customer group does not exist.
+          content: { }
   /registration/:
     get:
       summary: Return a list of registrations
@@ -3433,8 +3602,46 @@ components:
                   type: string
                   maxLength: 1000
               description: Price of the event. These are not bare numbers but instead descriptions of the pricing scheme.
-
+        offer_price_groups:
+          type: array
+          description: Customer group selections with concrete pricing for this offer. Used as initial values for registration customer groups when creating a registration for the event that this offer belongs to. When at least one customer group selection exists, the registration is considered to require a payment.
+          items:
+            $ref: "#/components/schemas/offer_price_group"
       description: Information record for this event. The prices are not in a structured format and the format depends on information source. An exception to this is the case of free event. These are indicated using is_free flag, which is searchable.
+    offer_price_group:
+      title: Customer group for a price offer
+      type: object
+      required:
+        - price_group
+        - price
+        - vat_percentage
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this offer customer group.
+          readOnly: true
+        price_group:
+          type: integer
+          description: The organization-level customer group whose instance this offer customer group is. Gives the name / label for the offer customer group and determines if the customer group is free. Price will be forced to 0 if the customer group is free.
+        price:
+          type: number
+          format: double
+          description: Price of this customer group including VAT.
+        price_without_vat:
+          type: number
+          format: double
+          description: Price of this customer group excluding VAT. Calculated automatically based on "price" and "vat_percentage".
+          readOnly: true
+        vat:
+          type: number
+          format: double
+          description: Amount of VAT. Calculated automatically based on "price" and "price_without_vat".
+          readOnly: true
+        vat_percentage:
+          type: number
+          format: double
+          description: VAT percentage of this customer group. Possible values are "24.00", "14.00", "10.00" and "0.00".
+      description: Customer group selection with concrete pricing for an event's price offer. Used as initial values for registration customer groups when creating a registration for the event that the offer belongs to.
     eventlink:
       title: Link to related information
       type: object
@@ -3552,6 +3759,18 @@ components:
       allOf:
         - $ref: "#/components/schemas/signup"
         - properties:
+            create_payment:
+              type: boolean
+              description: When set to "true", a payment will be created using the web store integration. A customer group selection must also be provided in the signup payload.
+            payment:
+              type: object
+              description: A payment created for the signup using the web store integration. Returned when a payment has been successfully created after passing the "create_payment" boolean in the signup payload.
+              readOnly: true
+              $ref: "#/components/schemas/payment"
+            price_group:
+              type: object
+              description: Customer group selection for this attendee. The customer group is used to determine the price for the signup. Mandatory when a registration has customer group selections.
+              $ref: "#/components/schemas/signup_price_group"
             contact_person:
               type: object
               description: Information of the attendee´s contact person.
@@ -3651,6 +3870,9 @@ components:
           type: object
           description: Information of the group´s contact person.
           $ref: "#/components/schemas/contact_person"
+        create_payment:
+          type: boolean
+          description: When set to "true", a payment will be created for the group using the web store integration. Signups need to have customer group selections in their payload.
         signups:
           type: array
           description: The list of persons to enrol to a registration as members of the same group
@@ -3696,6 +3918,11 @@ components:
           type: object
           description: Information of the group´s contact person
           $ref: "#/components/schemas/contact_person"
+        payment:
+          type: object
+          description: A payment created for the group using the web store integration. Returned when a payment has been successfully created after passing the "create_payment" boolean in the group payload.
+          readOnly: true
+          $ref: "#/components/schemas/payment"
       description: Response of the create signup group request
     contact_person:
       title: Contact person
@@ -3741,6 +3968,100 @@ components:
           description: Methods to send notifications to the contact person. Options are "none", "sms", "email" and "sms and email".
           example: sms and email
       description: Provides contact information for an attendee or an attendee group. In case of a group, the information will be shared for the whole group.
+    signup_price_group:
+        title: Customer group selection for a signup
+        type: object
+        required:
+          - registration_price_group
+        properties:
+          registration_price_group:
+            type: integer
+            description: ID of one of the registration's available customer group selections.
+        description: Customer group selection for an attendee. Determines the price of the signup.
+    payment:
+      title: Payment for a signup or group
+      type: object
+      readOnly: true
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this payment.
+          readOnly: true
+        external_order_id:
+          type: string
+          description: Unique identified for this payment in the Talpa web store. Returned by the web store after the payment has been successfully created.
+        checkout_url:
+          type: string
+          description: URL to Talpa web store's checkout UI. Does not require the user to be logged in. The payment can be paid using either checkout_url or logged_in_checkout_url.
+        logged_in_checkout_url:
+          type: string
+          description: URL to Talpa web store's checkout UI. Requires the user to be logged in. The payment can be paid using either checkout_url or logged_in_checkout_url.
+        amount:
+          type: number
+          format: double
+          description: Amount of the payment with VAT included.
+        status:
+          type: string
+          description: Status of the payment. Possible values are "created", "paid", "cancelled, "refunded" and "expired".
+        created_time:
+          type: string
+          format: date-time
+          description: Time when this payment was created
+          example: 2023-04-06T02:19:37.305781+03:00
+        last_modified_time:
+          type: string
+          format: date-time
+          description: Time when this payment was last modified
+          example: 2023-04-06T02:19:37.305781+03:00
+        created_by:
+          type: string
+          description: URL reference to the user that created this payment (user endpoint)
+        last_modified_by:
+          type: string
+          description: URL reference to the user that last modified this payment (user endpoint)
+      description: A payment created for a signup or a signup group using the web store integration. A signup is confirmed only when the payment is paid.
+    price_group:
+      title: Organization customer group
+      type: object
+      required:
+        - publisher
+        - description
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this customer group.
+          readOnly: true
+        publisher:
+          type: string
+          description: Unique identifier of the organization to which this customer group belongs to. Default customer group will have a NULL value here.
+        description:
+          type: string
+          maxLength: 255
+          description: Name or short description of the customer group.
+        is_free:
+          type: boolean
+          description: Determines if the customer group is free of charge or if it should have a price once it is used in registration customer group selections.
+        created_time:
+          type: string
+          format: date-time
+          description: Time when this customer group was created.
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        last_modified_time:
+          type: string
+          format: date-time
+          description: Time when this customer group was last modified.
+          example: 2023-04-06T02:19:37.305781+03:00
+          readOnly: true
+        created_by:
+          type: string
+          description: URL reference to the user that created this customer group (user endpoint).
+          readOnly: true
+        last_modified_by:
+          type: string
+          description: URL reference to the user that last modified this customer group (user endpoint).
+          readOnly: true
+      description: Customer group selection for an organization. Used for creating customer groups with prices for events and registrations. Default customer groups are available to all organizations.
     registration:
       title: Registration
       type: object
@@ -3854,6 +4175,11 @@ components:
           description: Registration user accesses are used to define registration specific permissions.
           items:
             $ref: "#/components/schemas/registration_user_access"
+        registration_price_groups:
+          type: array
+          description: Customer group selections that should be available when signing up to this registration. When at least one customer group selection exists, the registration is considered to require a payment.
+          items:
+            $ref: "#/components/schemas/registration_price_group"
       description: Registrations are used to store settings related to event registration.
     registration_user_access:
       title: Registration user accesses
@@ -3877,6 +4203,40 @@ components:
           type: boolean
           description: Determines if the registration user is a substitute user for the creator of the registration. A substitute user has full administration rights for the registration. The registration user's email must end with an allowed domain name to be able to set this to True. By default, only "hel.fi" domain is allowed.
       description: List of email addresses which has registration specific permissions.
+    registration_price_group:
+      title: Customer group for a registration
+      type: object
+      required:
+        - price_group
+        - price
+        - vat_percentage
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for this registration customer group.
+          readOnly: true
+        price_group:
+          type: integer
+          description: The organization-level customer group whose instance this registration customer group is. Gives the name / label for the registration customer group and determines if the customer group is free. Price will be forced to 0 if the customer group is free.
+        price:
+          type: number
+          format: double
+          description: Price of this customer group including VAT.
+        price_without_vat:
+          type: number
+          format: double
+          description: Price of this customer group excluding VAT. Calculated automatically based on "price" and "vat_percentage".
+          readOnly: true
+        vat:
+          type: number
+          format: double
+          description: Amount of VAT. Calculated automatically based on "price" and "price_without_vat".
+          readOnly: true
+        vat_percentage:
+          type: number
+          format: double
+          description: VAT percentage of this customer group. Possible values are "24.00", "14.00", "10.00" and "0.00".
+      description: Customer group selection with concrete pricing for a registration.
     seats_reservation:
       title: Seat reservation
       type: object
@@ -4562,6 +4922,25 @@ components:
       description: Search for places that contain the given string. This applies even when show_all_places is specified. Alternative name for the parameter is <code>filter</code>.
       schema:
         type: string
+
+    price_group_publisher_param:
+      name: publisher
+      in: query
+      description: Search for customer groups belonging to an organization as specified by id. Multiple ids are separated by comma. Use the value <code>none</code> for default customer groups.
+      schema:
+        type: string
+    price_group_description_param:
+      name: description
+      in: query
+      description: Search (case insensitive) through customer groups' multilingual description field.
+      schema:
+        type: string
+    price_group_is_free_param:
+      name: is_free
+      in: query
+      description: Search for customer groups that are free of charge or that have a price.
+      schema:
+        type: boolean
 
     registration_admin_user_param:
       name: admin_user
