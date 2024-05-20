@@ -1665,7 +1665,7 @@ paths:
         <pre><code>price_group/?description=adult</code></pre>
         
         <h3 id="customer-group-is-free">Is free</h3>
-        <p>To find out customer groups that are free of charge or vice versa, use the query parameter<code>is_free</code>.</p>
+        <p>To find out customer groups that are either free of charge or paid, use the query parameter<code>is_free</code>.</p>
         <p>Example:</p>
         <pre><code>price_group/?is_free=true</code></pre>
       operationId: price_group_list
