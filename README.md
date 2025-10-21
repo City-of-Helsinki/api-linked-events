@@ -1,3 +1,11 @@
+# 🗄️ Repository archived
+
+This repository has been archived and is no longer maintained.
+
+The API documentation was moved to be generated from the source code in the [linkedevents](https://github.com/City-of-Helsinki/linkedevents) repository.
+
+---
+
 # Linked events API, 6Aika
 
 Linked events on avoimen lähdekoodin tapahtumatietokanta ja avoin tapahtumarajapinta. Se tarjoaa erilaisille sovelluksille tapahtumatiedot ja niiden paikkatiedot yhdenmukaisessa ja koneluettavassa muodossa.
